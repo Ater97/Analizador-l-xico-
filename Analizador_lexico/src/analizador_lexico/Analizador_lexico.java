@@ -17,6 +17,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -32,35 +33,45 @@ public class Analizador_lexico {
     
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
+        boolean flag = true;
         String path = new File(".").getCanonicalPath();
         Lex(path + "\\src\\analizador_lexico\\Lexer.flex");
-        
-        
-        //OpenFile();
-        Analyzer();
+        while(flag){
+            Analyzer();
+            flag = stay();
+        }
+        System.exit(0);
     }
     public static void Analyzer() throws FileNotFoundException, IOException
     {
+        boolean flag_ERROR = false;
         File originalFile = OpenFile();
         Reader reader = new BufferedReader(new FileReader(originalFile.getPath()));
         Lexer lexer = new Lexer(reader);
-        int linecount =0;
         ArrayList<String> result = new ArrayList<String>();
 
         while(true){
             Token token = lexer.yylex();
             if(token==null){
-                result.add( "END");
-                createOUT(originalFile.getName(),originalFile.getPath(),result);
+                result.add("END");
+                if(!flag_ERROR){
+                    createOUT(originalFile.getName(),originalFile.getPath(),result);
+                }
                 return;
             }
             switch(token)
             {
-                case ERROR: result.add("Error in line number " + linecount);
-                break;
-                case NEWLINE: linecount++;
-                break;
-                default: result.add( "Token " + token + lexer.lexeme);
+                case ERROR: result.add(" " + token + " <" + lexer.lexeme+"> ");
+                     System.out.println(" " + token + " <" + lexer.lexeme+"> ");
+                    flag_ERROR = true;
+                break;      
+                default: 
+                    if("STRING"==token.toString()||"CONSTANT"==token.toString())
+                    {
+                        result.add(lexer.lexeme);
+                    }
+                    else
+                        result.add(lexer.lexeme.toLowerCase()); //"Token " + token + " "+ lexer.lexeme);
                 break;
             }
         }
@@ -99,9 +110,18 @@ public class Analizador_lexico {
  
 	for (int i = 0; i < MainList.size(); i++) {
 		bw.write(MainList.get(i));
-		bw.newLine();
+		//bw.newLine();
 	}
 	bw.close();
+    }
+         public static boolean stay()
+    {
+        int dialogButton = JOptionPane.YES_NO_OPTION;
+        int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to continue?","",dialogButton);
+        if(dialogResult == JOptionPane.YES_OPTION){
+            return true;
+        }
+        return false;
     }
     
 }

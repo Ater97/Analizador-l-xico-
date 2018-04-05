@@ -4,6 +4,9 @@ import static analizador_lexico.Token.*;
 %%
 %class Lexer
 %type Token
+%line
+%column
+%ignorecase
 
 /*letters */
 a = [aA]
@@ -38,27 +41,28 @@ reserved_words  = __halt_compiler|abstract| and| array| as| callable| catch| cla
                  declare| default| die| do| echo| empty| enddeclare| endfor| endforeach| 
                  endif| endswitch| endwhile|eval| exit| extends| final| function| global|  
                  implements| instanceof| insteadof| interface| isset| list| namespace|
-                 new| or| print| private| protected| public| require| return| static| throw|
-                 trait|try| unset| use| var| while| xor 
+                 new| print| private| protected| public| require| return| static| throw|
+                 trait|try| unset| use| var| while 
 /*Operators*/
-Comparison_op = "<"|">"|"<="|">="|"=="|"!="
+Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"==="|"<>"|"<=>"|"??"
 /*Arithmetic*/
-Arithmetic_Op   = "+"|"-"|"*"|"/"|"%"|"**"
+Arithmetic_Op   = \+|\-|\*|\/|\%|\*\*|"="
 /*Logic*/
-Logical_Op      = "and"|"or"|"xor"|"!"|"&&"|"||"
+Logical_Op      = ["and"|"or"|"xor"|"!"|"&&"|\|\|]*
 
 /*Types*/
 /*Logic*/
 Booleans        = {t}{r}{u}{e}|{f}{a}{l}{s}{e}
 /*Integers*/
-Decimal         = [1-9][0-9]* | 0
+Decimal         = [1-9][0-9]*|0
 Hexadecimal     = 0[xX][0-9a-fA-F]+
 Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
-Integers        = [+-]?Decimal | [+-]?Hexadecimal | [+-]?Octal | [+-]?Binary
-Double          = [+-]?(Integers*)((\.)(Integers*))?
+Integers        = [+-]?{Decimal}|[+-]?{Hexadecimal}|[+-]?{Octal}|[+-]?{Binary}
+Double          = [+-]?([1-9][0-9]*|0)(\.)[0-9]*
 /*Strings*/
-String          = ('([^(')(\n)(\\')])*')|(\"([^(\")(\n)(\\\")])*\")
+/*String          = ('([^(')(\n)(\\')])*')|(\"([^(\")(\n)(\\\")])*\")*/
+String          =('(.)*')|(\"(.)*\")
 
 /*Vars*/
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
@@ -77,11 +81,13 @@ reserved_var    = "$"({superglobal}|{otherrsrvd_var})
 control_struct  = ({i}{f}|{e}{l}{s}{e}|{e}{l}{s}{e}{i}{f}|{e}{n}{d}{i}{f}|{w}{h}{i}{l}{e}|{d}{o}|{f}{o}{r}|{f}{o}{r}{e}{a}{c}{h}|
                   {b}{r}{e}{a}{k}|{s}{w}{i}{t}{c}{h}|{c}{a}{s}{e}|{c}{o}{n}{t}{i}{n}{u}{e}|{r}{e}{t}{u}{r}{n}|{i}{n}{c}{l}{u}{d}{e}|
                   {g}{o}{t}{o}|require_once|include_once)
-Semicolon       = ";"
-Comma           = ","
-Parenthesis     = "("|")"
-Curly           = "{"|"}"
-Bracket         = "["|"]"
+Semicolon       = ;
+Comma           = ,
+Parenthesis     = \(|\)
+Brace           = \[|\]
+Bracket         = [\{|\}]*
+String          =('(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket})*')|(\"(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket})*\")
+
 
 /*Functions*/
 Function = function
@@ -92,45 +98,53 @@ Exponent_Dnum   = [+-]?(({Lnum} | {Dnum}) [eE][+-]? {Lnum})
 
 
 
-Identifier      = (_)?[a-zA-Z][a-zA-Z0-9_]*
-Comment         = ((\/\/)(.)*)|((\/\*)(.|\n)*(\*\/))
+Identifier      = ((_)*)?[a-zA-Z][a-zA-Z0-9_]*
+Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|(#(.)*) /*((\/\*)(.|\n)*(\*\/))*/
 
-php             = "<?php"
+php             = "<\?php"|"\?>"
 Newline         = \n
+WhiteSpace      = [\s\t\r\v\f]
 
+Point           = \.
 %{
     public String lexeme;
-    public int LineCount = 0;
 %}
 
 %%
-/*Rules Section*/
-[Newline]           {LineCount++; lexeme=yytext(); return NEWLINE;}
-{php}               { lexeme=yytext(); return PHP;}
-.                   {lexeme = yytext();return ERROR;}
+{php}               {lexeme = yytext(); return PHP;}
+
+{Comment}           {lexeme=yytext(); return COMMENT;}
+
+{Newline}           {lexeme=yytext(); return NEWLINE;}
+{WhiteSpace}        {lexeme=yytext(); return WHITESPACE;}
+{Bracket}           {lexeme=yytext(); return BRACKET;}
+
+{Parenthesis}       {lexeme=yytext(); return PARENTHESIS;}
+{Brace}             {lexeme=yytext(); return BRACE;}
+
+{String}            {lexeme=yytext(); return STRING;}
+{control_struct}    {lexeme=yytext(); return CONTROL_STRUCTURE;}
+{reserved_var}      {lexeme=yytext(); return RESERVED_VARIABLE;}
 
 {reserved_words}    {lexeme=yytext(); return RESERVED_WORD;}
 {Comparison_op}     {lexeme=yytext(); return COMPARISON_OPERATOR;}
 {Arithmetic_Op}     {lexeme=yytext(); return ARITHMETIC_OPERATOR;}
-{Logical_Op }       {lexeme=yytext(); return LOGICAL_OPERATOR;}
+{Logical_Op}        {lexeme=yytext(); return LOGICAL_OPERATOR;}
 
 {Integers}          {lexeme=yytext(); return INTEGER;}
 {Double}            {lexeme=yytext(); return DOUBLE;}
-{String}            {lexeme=yytext(); return STRING;}
+
 {Exponent_Dnum}     {lexeme=yytext(); return FLOATING_POINT_NUM;}
 
 {Identifier}        {lexeme=yytext(); return IDENTIFIER;}
 
 {var_id }           {lexeme=yytext(); return VARIABLE_ID;}
-{reserved_var}      {lexeme=yytext(); return RESERVED_VARIABLE;}
 
-{Magic_constant}    {lexeme=yytext(); return CONSTANT;}
 
-{control_struct}    {lexeme=yytext(); return CONTROL_STRUCTURE;}
+{Magic_constant}|{superglobal}    {lexeme=yytext(); return CONSTANT;}
+
 {Semicolon}         {lexeme=yytext(); return SEMICOLON;}
 {Comma}             {lexeme=yytext(); return COMMA;}
-{Parenthesis}       {lexeme=yytext(); return PARENTHESIS;}
-{Curly}             {lexeme=yytext(); return CURLY;}
-{Bracket}           {lexeme=yytext(); return BRACKET;}
+{Point}               {lexeme = yytext(); return POINT;}
 
-{Comment}           {lexeme=yytext(); return COMMENT;}
+.                   {lexeme = yytext();return ERROR;}
