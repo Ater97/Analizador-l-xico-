@@ -59,17 +59,28 @@ Integers        = [+-]?Decimal | [+-]?Hexadecimal | [+-]?Octal | [+-]?Binary
 /*Strings*/
 String          = ('[(.)(\n)(\\')]*')|(\"[(.)(\n)(\\")]*\")
 
-/*IDs*/
-var_id          = "$"{Basic}
-/*Vars*/
+
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
-/*Consts*/
+var_id          = "$"{Basic}
+
+/*Predefined Variables*/
+superglobal     = (GLOBALS|_(SERVER|GET|POST|FILES|COOKIE|SESSION|REQUEST|ENV))
+otherrsrvd_var  = (php_errormsg|HTTP_RAW_POST_DATA|http_response_header|argc|argv)
+rsrvd_var       = "$"{superglobal}|{otherrsrvd_var_var}
+
 
 /*Control structures*/
 control_struct  = ({i}{f}|{e}{l}{s}{e}|{e}{l}{s}{e}{i}{f}|{e}{n}{d}{i}{f}|{w}{h}{i}{l}{e}|{d}{o}|{f}{o}{r}|{f}{o}{r}{e}{a}{c}{h}|
                   {b}{r}{e}{a}{k}|{s}{w}{i}{t}{c}{h}|{c}{a}{s}{e}|{c}{o}{n}{t}{i}{n}{u}{e}|{r}{e}{t}{u}{r}{n}|{i}{n}{c}{l}{u}{d}{e}|
                   {g}{o}{to}|require_once|include_once)
+Semicolon       = ";"
+Comma           = ","
+Parenthesis     = "("|")"
+curly           = "{"|"}"
+Bracket         = "["|"]"
 
+/*Functions*/
+Function = function
 /*Floating point numbers*/
 Lnum            = [0-9]+ 
 Dnum            = ([0-9]*[\.]{Lnum}) | ({Lnum}[\.][0-9]*)
