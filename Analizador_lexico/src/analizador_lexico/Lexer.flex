@@ -57,15 +57,15 @@ Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
 Integers        = [+-]?Decimal | [+-]?Hexadecimal | [+-]?Octal | [+-]?Binary
 /*Strings*/
-String          = ('[(.)(\n)(\\')]*')|(\"[(.)(\n)(\\")]*\")
+String          = ('([^(')(\n)\\'])*')|(\"([^(\")(\n)]\\\"])*\")
 
 
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
 
 /*Predefined Variables*/
-superglobal     = (GLOBALS|_(SERVER|GET|POST|FILES|COOKIE|SESSION|REQUEST|ENV))
-otherrsrvd_var  = (php_errormsg|HTTP_RAW_POST_DATA|http_response_header|argc|argv)
+superglobal     = GLOBALS|_(SERVER|GET|POST|FILES|COOKIE|SESSION|REQUEST|ENV)
+otherrsrvd_var  = php_errormsg|HTTP_RAW_POST_DATA|http_response_header|argc|argv
 rsrvd_var       = "$"{superglobal}|{otherrsrvd_var_var}
 
 
@@ -100,6 +100,5 @@ php             = "<?php"
 
 %%
 /*Rules Section*/
-{white}         {/*Ignore*/}
-{letter}        {lexeme = yytext(); return Variable;}
+
 .               {lexeme = yytext();return ERROR;}
