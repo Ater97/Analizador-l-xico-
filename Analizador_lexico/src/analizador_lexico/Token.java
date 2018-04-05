@@ -10,5 +10,5 @@ package analizador_lexico;
  * @author sebas
  */
 public enum Token {
-    Variable, ERROR;
+    NEWLINE, PHP, ERROR, RESERVED_WORD, COMPARISON_OPERATOR, ARITHMETIC_OPERATOR, LOGICAL_OPERATOR;
 }

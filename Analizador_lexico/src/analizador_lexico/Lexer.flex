@@ -57,9 +57,9 @@ Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
 Integers        = [+-]?Decimal | [+-]?Hexadecimal | [+-]?Octal | [+-]?Binary
 /*Strings*/
-String          = ('([^(')(\n)\\'])*')|(\"([^(\")(\n)]\\\"])*\")
+String          = ('([^(')(\n)(\\')])*')|(\"([^(\")(\n)(\\\")])*\")
 
-
+/*Vars*/
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
 
@@ -92,13 +92,20 @@ Identifier      = [a-zA-Z][a-zA-Z0-9_]*
 comment         = (("//")(.)*)|(("/*")(.)*("*/"))
 
 php             = "<?php"
-
+Newline         = \n
 
 %{
     public String lexeme;
+    public int LineCount = 0;
 %}
 
 %%
 /*Rules Section*/
+[Newline]              {LineCount++; lexeme=yytext(); return NEWLINE;}
+{php}               { lexeme=yytext(); return PHP;}
+.                   {lexeme = yytext();return ERROR;}
 
-.               {lexeme = yytext();return ERROR;}
+{reserved_words}    {lexeme=yytext(); return RESERVED_WORD;}
+{Comparison_op}     {lexeme=yytext(); return COMPARISON_OPERATOR;}
+{Arithmetic_Op}     {lexeme=yytext(); return ARITHMETIC_OPERATOR;}
+{Logical_Op }       {lexeme=yytext(); return LOGICAL_OPERATOR;}
