@@ -50,7 +50,7 @@ public class Analizador_lexico {
         Lexer lexer = new Lexer(reader);
         ArrayList<String> result = new ArrayList<String>();
 
-        int lineNumber =0;
+        int lineNumber =1;
         while(true){
             Token token = lexer.yylex();
             if(token==null){
@@ -60,7 +60,7 @@ public class Analizador_lexico {
                 }
                 return;
             }
-            if(lexer.lexeme.contains("\n"))
+            if(lexer.lexeme.contains("\n")||lexer.lexeme.contains("\t"))
                 lineNumber++;
             switch(token)
             {
@@ -69,7 +69,7 @@ public class Analizador_lexico {
                     flag_ERROR = true;
                 break;      
                 default: 
-                    if("STRING"==token.toString()||"CONSTANT"==token.toString())
+                    if("STRING"==token.toString()||"CONSTANT"==token.toString()||"RESERVED_WORD"==token.toString())
                     {
                         result.add(lexer.lexeme);
                     }

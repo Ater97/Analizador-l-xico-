@@ -105,7 +105,7 @@ php             = "<\?php"|"\?>"
 Newline         = \n
 WhiteSpace      = [\s\t\r\v\f]
 
-Point           = \.|\@|\?|:|\\
+Point           = \.|\@|\?|:
 %{
     public String lexeme;
 %}
