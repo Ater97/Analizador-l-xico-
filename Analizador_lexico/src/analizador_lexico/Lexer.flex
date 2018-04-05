@@ -34,11 +34,11 @@ y = [yY]
 z = [zZ]
 
 /*Reserved words*/
-reserved_words  = __halt_compiler|abstract| and| array| as| break|callable| case| catch| class| clone| const|
-                 continue| declare| default| die| do| echo| else| elseif| empty| enddeclare| endfor| endforeach| 
-                 endif| endswitch| endwhile|eval| exit| extends| final| for| foreach| function| global| goto| 
-                 if| implements| include| include_once| instanceof| insteadof| interface| isset| list| namespace|
-                 new| or| print| private| protected| public| require| require_once| return| static| switch| throw|
+reserved_words  = __halt_compiler|abstract| and| array| as| callable| catch| class| clone| const|
+                 declare| default| die| do| echo| empty| enddeclare| endfor| endforeach| 
+                 endif| endswitch| endwhile|eval| exit| extends| final| function| global|  
+                 implements| instanceof| insteadof| interface| isset| list| namespace|
+                 new| or| print| private| protected| public| require| return| static| throw|
                  trait|try| unset| use| var| while| xor 
 /*Operators*/
 Comparison_op = "<"|">"|"<="|">="|"=="|"!="
@@ -56,6 +56,7 @@ Hexadecimal     = 0[xX][0-9a-fA-F]+
 Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
 Integers        = [+-]?Decimal | [+-]?Hexadecimal | [+-]?Octal | [+-]?Binary
+Double          = [+-]?(Integers*)((\.)(Integers*))?
 /*Strings*/
 String          = ('([^(')(\n)(\\')])*')|(\"([^(\")(\n)(\\\")])*\")
 
@@ -63,20 +64,23 @@ String          = ('([^(')(\n)(\\')])*')|(\"([^(\")(\n)(\\\")])*\")
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
 
+/*Consts*/
+Magic_constant = (__)(LINE|FILE|DIR|FUNCTION|CLASS|TRAIT|METHOD|NAMESPACE)(__)
+
 /*Predefined Variables*/
 superglobal     = GLOBALS|_(SERVER|GET|POST|FILES|COOKIE|SESSION|REQUEST|ENV)
 otherrsrvd_var  = php_errormsg|HTTP_RAW_POST_DATA|http_response_header|argc|argv
-rsrvd_var       = "$"{superglobal}|{otherrsrvd_var_var}
+reserved_var    = "$"({superglobal}|{otherrsrvd_var})
 
 
 /*Control structures*/
 control_struct  = ({i}{f}|{e}{l}{s}{e}|{e}{l}{s}{e}{i}{f}|{e}{n}{d}{i}{f}|{w}{h}{i}{l}{e}|{d}{o}|{f}{o}{r}|{f}{o}{r}{e}{a}{c}{h}|
                   {b}{r}{e}{a}{k}|{s}{w}{i}{t}{c}{h}|{c}{a}{s}{e}|{c}{o}{n}{t}{i}{n}{u}{e}|{r}{e}{t}{u}{r}{n}|{i}{n}{c}{l}{u}{d}{e}|
-                  {g}{o}{to}|require_once|include_once)
+                  {g}{o}{t}{o}|require_once|include_once)
 Semicolon       = ";"
 Comma           = ","
 Parenthesis     = "("|")"
-curly           = "{"|"}"
+Curly           = "{"|"}"
 Bracket         = "["|"]"
 
 /*Functions*/
@@ -88,8 +92,8 @@ Exponent_Dnum   = [+-]?(({Lnum} | {Dnum}) [eE][+-]? {Lnum})
 
 
 
-Identifier      = [a-zA-Z][a-zA-Z0-9_]*
-comment         = (("//")(.)*)|(("/*")(.)*("*/"))
+Identifier      = (_)?[a-zA-Z][a-zA-Z0-9_]*
+Comment         = (("//")(.)*)|(("/*")(.)*("*/"))
 
 php             = "<?php"
 Newline         = \n
@@ -101,7 +105,7 @@ Newline         = \n
 
 %%
 /*Rules Section*/
-[Newline]              {LineCount++; lexeme=yytext(); return NEWLINE;}
+[Newline]           {LineCount++; lexeme=yytext(); return NEWLINE;}
 {php}               { lexeme=yytext(); return PHP;}
 .                   {lexeme = yytext();return ERROR;}
 
@@ -109,3 +113,24 @@ Newline         = \n
 {Comparison_op}     {lexeme=yytext(); return COMPARISON_OPERATOR;}
 {Arithmetic_Op}     {lexeme=yytext(); return ARITHMETIC_OPERATOR;}
 {Logical_Op }       {lexeme=yytext(); return LOGICAL_OPERATOR;}
+
+{Integers}          {lexeme=yytext(); return INTEGER;}
+{Double}            {lexeme=yytext(); return DOUBLE;}
+{String}            {lexeme=yytext(); return STRING;}
+{Exponent_Dnum}     {lexeme=yytext(); return FLOATING_POINT_NUM;}
+
+{Identifier}        {lexeme=yytext(); return IDENTIFIER;}
+
+{var_id }           {lexeme=yytext(); return VARIABLE_ID;}
+{reserved_var}      {lexeme=yytext(); return RESERVED_VARIABLE;}
+
+{Magic_constant}    {lexeme=yytext(); return CONSTANT;}
+
+{control_struct}    {lexeme=yytext(); return CONTROL_STRUCTURE;}
+{Semicolon}         {lexeme=yytext(); return SEMICOLON;}
+{Comma}             {lexeme=yytext(); return COMMA;}
+{Parenthesis}       {lexeme=yytext(); return PARENTHESIS;}
+{Curly}             {lexeme=yytext(); return CURLY;}
+{Bracket}           {lexeme=yytext(); return BRACKET;}
+
+{Comment}           {lexeme=yytext(); return COMMENT;}

@@ -27,7 +27,8 @@ public class Analizador_lexico {
         String path = new File(".").getCanonicalPath();
         Lex(path + "\\src\\analizador_lexico\\Lexer.flex");
         
-       // OpenFile();
+        
+        //OpenFile();
         
     }
     public static void Lex(String path)
