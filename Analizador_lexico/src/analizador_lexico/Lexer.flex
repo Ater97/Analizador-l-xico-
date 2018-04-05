@@ -93,7 +93,7 @@ Exponent_Dnum   = [+-]?(({Lnum} | {Dnum}) [eE][+-]? {Lnum})
 
 
 Identifier      = (_)?[a-zA-Z][a-zA-Z0-9_]*
-Comment         = (("//")(.)*)|(("/*")(.)*("*/"))
+Comment         = ((\/\/)(.)*)|((\/\*)(.|\n)*(\*\/))
 
 php             = "<?php"
 Newline         = \n

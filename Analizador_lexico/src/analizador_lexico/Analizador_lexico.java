@@ -5,8 +5,16 @@
  */
 package analizador_lexico;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -29,7 +37,33 @@ public class Analizador_lexico {
         
         
         //OpenFile();
-        
+        Analyzer();
+    }
+    public static void Analyzer() throws FileNotFoundException, IOException
+    {
+        File originalFile = OpenFile();
+        Reader reader = new BufferedReader(new FileReader(originalFile.getPath()));
+        Lexer lexer = new Lexer(reader);
+        int linecount =0;
+        ArrayList<String> result = new ArrayList<String>();
+
+        while(true){
+            Token token = lexer.yylex();
+            if(token==null){
+                result.add( "END");
+                createOUT(originalFile.getName(),originalFile.getPath(),result);
+                return;
+            }
+            switch(token)
+            {
+                case ERROR: result.add("Error in line number " + linecount);
+                break;
+                case NEWLINE: linecount++;
+                break;
+                default: result.add( "Token " + token + lexer.lexeme);
+                break;
+            }
+        }
     }
     public static void Lex(String path)
     {
@@ -51,6 +85,23 @@ public class Analizador_lexico {
             fileParse = fileChooser.getSelectedFile();
             System.out.println("Save as file: " + fileParse.getAbsolutePath());}
         return  fileParse;
+    }
+    
+       public static void createOUT(String filename, String path, ArrayList<String> MainList) throws IOException
+    {
+        path = path.replace(filename, "");
+        filename = filename.replace(".php", "");  
+        
+        File fout = new File(path,filename+".out");
+	FileOutputStream fos = new FileOutputStream(fout);
+ 
+	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+ 
+	for (int i = 0; i < MainList.size(); i++) {
+		bw.write(MainList.get(i));
+		bw.newLine();
+	}
+	bw.close();
     }
     
 }
