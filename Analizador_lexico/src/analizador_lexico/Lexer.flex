@@ -105,7 +105,7 @@ php             = "<\?php"|"\?>"
 Newline         = \n
 WhiteSpace      = [\s\t\r\v\f]
 
-Point           = \.
+Point           = \.|\@|\?|:
 %{
     public String lexeme;
 %}
@@ -141,10 +141,10 @@ Point           = \.
 {var_id }           {lexeme=yytext(); return VARIABLE_ID;}
 
 
-{Magic_constant}|{superglobal}    {lexeme=yytext(); return CONSTANT;}
+{Magic_constant}    {lexeme=yytext(); return CONSTANT;}
 
 {Semicolon}         {lexeme=yytext(); return SEMICOLON;}
 {Comma}             {lexeme=yytext(); return COMMA;}
 {Point}               {lexeme = yytext(); return POINT;}
 
-.                   {lexeme = yytext();return ERROR;}
+.                   {lexeme = yytext(); return ERROR;}

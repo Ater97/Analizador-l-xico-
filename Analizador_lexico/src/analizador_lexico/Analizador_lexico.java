@@ -50,6 +50,7 @@ public class Analizador_lexico {
         Lexer lexer = new Lexer(reader);
         ArrayList<String> result = new ArrayList<String>();
 
+        int lineNumber =0;
         while(true){
             Token token = lexer.yylex();
             if(token==null){
@@ -59,10 +60,12 @@ public class Analizador_lexico {
                 }
                 return;
             }
+           // if(lexer.lexeme.contains("\n"))
+             //   lineNumber++;
             switch(token)
             {
                 case ERROR: result.add(" " + token + " <" + lexer.lexeme+"> ");
-                     System.out.println(" " + token + " <" + lexer.lexeme+"> ");
+                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line ");//+ lineNumber);
                     flag_ERROR = true;
                 break;      
                 default: 
