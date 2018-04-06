@@ -55,7 +55,7 @@ public class Analizador_lexico {
         while(true){
             Token token = lexer.yylex();
             if(token==null){
-                result.add("END");
+                //result.add("END");
                // if(!flag_ERROR){
                     createOUT(originalFile.getName(),originalFile.getPath(),result);
                 //}
@@ -78,6 +78,9 @@ public class Analizador_lexico {
                 break;
                 case RESERVED_VARIABLE:
                     result.add(lexer.lexeme.toUpperCase());
+                break;
+                case CONTROL_STRUCTURE:
+                    result.add(lexer.lexeme.toLowerCase());
                 break;
                 default: 
                     result.add(lexer.lexeme); //"Token " + token + " "+ lexer.lexeme);

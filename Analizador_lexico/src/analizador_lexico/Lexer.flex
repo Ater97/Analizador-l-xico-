@@ -37,7 +37,7 @@ y = [yY]
 z = [zZ]
 
 /*Reserved words*/
-reserved_words  = __halt_compiler|abstract|and|array|as|callable|catch|class|clone|const|declare|default|die|do|echo|empty|enddeclare|endfor|endforeach|endif|endswitch|endwhile|eval|exit|extends|final|function|global|implements|instanceof|insteadof|interface|isset|list|namespace|new|print|private|protected|public|require|return|static|throw|trait|try|unset|use|var|while
+reserved_words  = __halt_compiler|abstract|and|array|as|callable|catch|class|clone|const|declare|default|do|empty|enddeclare|endfor|endforeach|endswitch|endwhile|eval|exit|extends|final|global|implements|instanceof|insteadof|interface|isset|list|namespace|new|print|private|protected|public|require|static|throw|trait|try|unset|use|var
 /*Operators*/
 Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"==="|"<>"|"<=>"|"??"
 /*Arithmetic*/
@@ -64,19 +64,17 @@ Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
 
 /*Consts*/ /*may*/
-Magic_constant = (__)({l}{i}{n}{e}|{f}{i}{l}{e}|{d}{i}{r}|{f}{u}{n}{c}{t}{i}{o}{n}|{c}{l}{a}{s}{s}|{t}{r}{a}{i}{t}|{m}{e}{t}{h}{o}{d}|{n}{a}{m}{e}{s}{p}{a}{c}{e})(__)
+Magic_constant = (__)({l}{i}{n}{e}|{f}{i}{l}{e}|{d}{i}{r}|{c}{l}{a}{s}{s}|{t}{r}{a}{i}{t}|{m}{e}{t}{h}{o}{d}|{n}{a}{m}{e}{s}{p}{a}{c}{e})(__)
                       
 /*Predefined Variables*//*may*/
 superglobal     = {g}{l}{o}{b}{a}{l}{s}|_({s}{e}{r}{v}{e}{r}|{g}{e}{t}|{p}{o}{s}{t}|{f}{i}{l}{e}{s}|{c}{o}{o}{k}{i}{e}|{s}{e}{s}{s}{i}{o}{n}|{r}{e}{q}{u}{e}{s}{t}|{e}{n}{v})
                                           
 otherrsrvd_var  = "$"(php_errormsg|http_response_header|argc|argv)
-reserved_var    = "$"({superglobal}|{h}{t}{t}{p}_{r}{a}{w}_{p}{o}{s}{t}_{d}{a}{t}{a})
+reserved_var    = "$"({superglobal}|{h}{t}{t}{p}_{r}{a}{w}_{p}{o}{s}{t}_{d}{a}{t}{a})|{DataBase}
 
 
 /*Control structures*/
-control_struct  = ({i}{f}|{e}{l}{s}{e}|{e}{l}{s}{e}{i}{f}|{e}{n}{d}{i}{f}|{w}{h}{i}{l}{e}|{d}{o}|{f}{o}{r}|{f}{o}{r}{e}{a}{c}{h}|
-                  {b}{r}{e}{a}{k}|{s}{w}{i}{t}{c}{h}|{c}{a}{s}{e}|{c}{o}{n}{t}{i}{n}{u}{e}|{r}{e}{t}{u}{r}{n}|{i}{n}{c}{l}{u}{d}{e}|
-                  {g}{o}{t}{o}|require_once|include_once)
+control_struct  = ({i}{f}|{e}{l}{s}{e}|{e}{l}{s}{e}{i}{f}|{e}{n}{d}{i}{f}|{w}{h}{i}{l}{e}|{d}{o}|{f}{o}{r}|{f}{o}{r}{e}{a}{c}{h}|{b}{r}{e}{a}{k}|{s}{w}{i}{t}{c}{h}|{c}{a}{s}{e}|{c}{o}{n}{t}{i}{n}{u}{e}|{r}{e}{t}{u}{r}{n}|{i}{n}{c}{l}{u}{d}{e}|{g}{o}{t}{o}|require_once|include_once|{f}{u}{n}{c}{t}{i}{o}{n}|{e}{c}{h}{o}|{d}{i}{e})
 Semicolon       = ;
 Comma           = ,
 Parenthesis     = \(|\)
@@ -95,18 +93,25 @@ Exponent_Dnum   = [+-]?(({Lnum} | {Dnum}) [eE][+-]? {Lnum})
 
 
 Identifier      = ((_)*)?[a-zA-Z][a-zA-Z0-9_]*
-Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|(#(.)*) /*((\/\*)(.|\n)*(\*\/))*/
+/*("<"{h}{t}{m}{l}">"~"</"{h}{t}{m}{l}">")*/
+Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|(#(.)*)|[0-9]*"pt"
 
 php             = "<\?php"|"\?>"
 Newline         = \n
 WhiteSpace      = [\s\t\r\v\f]
 
-Point           = \.|\?|:
+Point           = \.|\?|:|\\|\"
+
+DataBase        = "['"[a-zA-Z_]*"']"
+Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(.|\n)*)|("=!=")
 %{
     public String lexeme;
 %}
 
 %%
+{control_struct}    {lexeme=yytext(); return CONTROL_STRUCTURE;}
+{reserved_var}      {lexeme=yytext(); return RESERVED_VARIABLE;}
+{otherrsrvd_var}    {lexeme=yytext(); return OTHERRESERVED_VARIABLE;}
 {php}               {lexeme = yytext(); return PHP;}
 
 {Comment}           {lexeme=yytext(); return COMMENT;}
@@ -120,9 +125,7 @@ Point           = \.|\?|:
 {Magic_constant}    {lexeme=yytext(); return CONSTANT;}
 {reserved_words}    {lexeme=yytext(); return RESERVED_WORD;}
 
-{control_struct}    {lexeme=yytext(); return CONTROL_STRUCTURE;}
-{reserved_var}      {lexeme=yytext(); return RESERVED_VARIABLE;}
-{otherrsrvd_var}    {lexeme=yytext(); return OTHERRESERVED_VARIABLE;}
+
 
 {String}            {lexeme=yytext(); return STRING;}
 
@@ -145,4 +148,5 @@ Point           = \.|\?|:
 {Comma}             {lexeme=yytext(); return COMMA;}
 {Point}               {lexeme = yytext(); return POINT;}
 
+{Errors}            {lexeme = yytext(); return ERROR;}
 .                   {lexeme = yytext(); return ERROR;}
