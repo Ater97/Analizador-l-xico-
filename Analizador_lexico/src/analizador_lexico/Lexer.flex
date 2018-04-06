@@ -64,13 +64,13 @@ Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
 
 /*Consts*/ /*may*/
-Magic_constant = (__)(LINE|FILE|DIR|FUNCTION|CLASS|TRAIT|METHOD|NAMESPACE)(__)
+Magic_constant = (__)({l}{i}{n}{e}|{f}{i}{l}{e}|{d}{i}{r}|{f}{u}{n}{c}{t}{i}{o}{n}|{c}{l}{a}{s}{s}|{t}{r}{a}{i}{t}|{m}{e}{t}{h}{o}{d}|{n}{a}{m}{e}{s}{p}{a}{c}{e})(__)
                       
 /*Predefined Variables*//*may*/
 superglobal     = {g}{l}{o}{b}{a}{l}{s}|_({s}{e}{r}{v}{e}{r}|{g}{e}{t}|{p}{o}{s}{t}|{f}{i}{l}{e}{s}|{c}{o}{o}{k}{i}{e}|{s}{e}{s}{s}{i}{o}{n}|{r}{e}{q}{u}{e}{s}{t}|{e}{n}{v})
                                           
-otherrsrvd_var  = php_errormsg|HTTP_RAW_POST_DATA|http_response_header|argc|argv
-reserved_var    = "$"({superglobal}|{otherrsrvd_var})
+otherrsrvd_var  = "$"(php_errormsg|http_response_header|argc|argv)
+reserved_var    = "$"({superglobal}|{h}{t}{t}{p}_{r}{a}{w}_{p}{o}{s}{t}_{d}{a}{t}{a})
 
 
 /*Control structures*/
@@ -122,6 +122,7 @@ Point           = \.|\?|:
 
 {control_struct}    {lexeme=yytext(); return CONTROL_STRUCTURE;}
 {reserved_var}      {lexeme=yytext(); return RESERVED_VARIABLE;}
+{otherrsrvd_var}    {lexeme=yytext(); return OTHERRESERVED_VARIABLE;}
 
 {String}            {lexeme=yytext(); return STRING;}
 
