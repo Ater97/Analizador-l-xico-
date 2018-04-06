@@ -67,16 +67,20 @@ public class Analizador_lexico {
             {
                 case ERROR: result.add(" " + token + " =>" + lexer.lexeme+" ");
                     ERRORSNumber++;
-                     System.out.println(" "+ ERRORSNumber + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                     System.out.println(" "+ ERRORSNumber+" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                     flag_ERROR = true;
-                break;      
+                break;   
+                case CONSTANT:
+                    result.add(lexer.lexeme.toUpperCase());
+                break;
+                case RESERVED_WORD:
+                    result.add(lexer.lexeme.toUpperCase());
+                break;
+                case RESERVED_VARIABLE:
+                    result.add(lexer.lexeme.toUpperCase());
+                break;
                 default: 
-                    if("STRING"==token.toString()||"CONSTANT"==token.toString()||"RESERVED_WORD"==token.toString())
-                    {
-                        result.add(lexer.lexeme);
-                    }
-                    else
-                        result.add(lexer.lexeme.toLowerCase()); //"Token " + token + " "+ lexer.lexeme);
+                    result.add(lexer.lexeme); //"Token " + token + " "+ lexer.lexeme);
                 break;
             }
         }

@@ -63,11 +63,12 @@ String          =('(.)*')|(\"(.)*\")
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
 
-/*Consts*/
+/*Consts*/ /*may*/
 Magic_constant = (__)(LINE|FILE|DIR|FUNCTION|CLASS|TRAIT|METHOD|NAMESPACE)(__)
-
-/*Predefined Variables*/
-superglobal     = GLOBALS|_(SERVER|GET|POST|FILES|COOKIE|SESSION|REQUEST|ENV)
+                      
+/*Predefined Variables*//*may*/
+superglobal     = {g}{l}{o}{b}{a}{l}{s}|_({s}{e}{r}{v}{e}{r}|{g}{e}{t}|{p}{o}{s}{t}|{f}{i}{l}{e}{s}|{c}{o}{o}{k}{i}{e}|{s}{e}{s}{s}{i}{o}{n}|{r}{e}{q}{u}{e}{s}{t}|{e}{n}{v})
+                                          
 otherrsrvd_var  = php_errormsg|HTTP_RAW_POST_DATA|http_response_header|argc|argv
 reserved_var    = "$"({superglobal}|{otherrsrvd_var})
 
