@@ -98,7 +98,7 @@ public class Analizador_lexico {
     {
         File fileParse = null;
         JFrame parentFrame = new JFrame();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("PHP Files", "php");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("C# Files", "sc");
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Specify a file");  
         fileChooser.setFileFilter(filter);
@@ -113,7 +113,7 @@ public class Analizador_lexico {
        public static void createOUT(String filename, String path, ArrayList<String> MainList) throws IOException
     {
         path = path.replace(filename, "");
-        filename = filename.replace(".php", "");  
+        filename = filename.replace(".sc", "");  
         
         File fout = new File(path,filename+".out");
 	FileOutputStream fos = new FileOutputStream(fout);

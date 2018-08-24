@@ -37,8 +37,13 @@ y = [yY]
 z = [zZ]
 
 /*Reserved words*/
-reserved_words  = __halt_compiler|abstract|and|array|as|callable|catch|class|clone|const|declare|default|do|empty|enddeclare|endfor|endforeach|endswitch|endwhile|eval|exit|extends|final|global|implements|instanceof|insteadof|interface|isset|list|namespace|new|print|private|protected|public|require|static|throw|trait|try|unset|use|var
+/*reserved_words  = __halt_compiler|abstract|and|array|as|callable|catch|class|clone|const|declare|default|do|empty|enddeclare|endfor|endforeach|endswitch|endwhile|eval|exit|extends|final|global|implements|instanceof|insteadof|interface|isset|list|namespace|new|print|private|protected|public|require|static|throw|trait|try|unset|use|var*/
+reserved_words  = void|int|double|bool|string|class|interface|null|this|extends|implements|for|while|if|else|return|break|New|NewArray
+
 /*Operators*/
+Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"==="|"<>"|"<=>"|"??"
+/*Arithmetic*/
+Arithmetic_Op   = \+|\-|\*|\/|\%|\*\*|"="
 Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"==="|"<>"|"<=>"|"??"
 /*Arithmetic*/
 Arithmetic_Op   = \+|\-|\*|\/|\%|\*\*|"="
@@ -112,7 +117,6 @@ Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(.|\n)*)|("=!=")
 {control_struct}    {lexeme=yytext(); return CONTROL_STRUCTURE;}
 {reserved_var}      {lexeme=yytext(); return RESERVED_VARIABLE;}
 {otherrsrvd_var}    {lexeme=yytext(); return OTHERRESERVED_VARIABLE;}
-{php}               {lexeme = yytext(); return PHP;}
 
 {Comment}           {lexeme=yytext(); return COMMENT;}
 
