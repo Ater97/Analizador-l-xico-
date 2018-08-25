@@ -44,9 +44,6 @@ reserved_words  = void|int|double|bool|string|class|interface|null|this|extends|
 Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"==="|"<>"|"<=>"|"??"
 /*Arithmetic*/
 Arithmetic_Op   = \+|\-|\*|\/|\%|\*\*|"="
-Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"==="|"<>"|"<=>"|"??"
-/*Arithmetic*/
-Arithmetic_Op   = \+|\-|\*|\/|\%|\*\*|"="
 /*Logic*/
 Logical_Op      = ["and"|"or"|"xor"|"!"|"&&"|\|\|]+
 
@@ -67,19 +64,9 @@ String          =('(.)*')|(\"(.)*\")
 /*Vars*/
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
-
-/*Consts*/ /*may*/
-Magic_constant = (__)({l}{i}{n}{e}|{f}{i}{l}{e}|{d}{i}{r}|{c}{l}{a}{s}{s}|{t}{r}{a}{i}{t}|{m}{e}{t}{h}{o}{d}|{n}{a}{m}{e}{s}{p}{a}{c}{e})(__)
-                      
-/*Predefined Variables*//*may*/
-superglobal     = {g}{l}{o}{b}{a}{l}{s}|_({s}{e}{r}{v}{e}{r}|{g}{e}{t}|{p}{o}{s}{t}|{f}{i}{l}{e}{s}|{c}{o}{o}{k}{i}{e}|{s}{e}{s}{s}{i}{o}{n}|{r}{e}{q}{u}{e}{s}{t}|{e}{n}{v})
-                                          
-otherrsrvd_var  = "$"(php_errormsg|http_response_header|argc|argv)
-reserved_var    = "$"({superglobal}|{h}{t}{t}{p}_{r}{a}{w}_{p}{o}{s}{t}_{d}{a}{t}{a})|{DataBase}
-
-
+                                                      
 /*Control structures*/
-control_struct  = ({i}{f}|{e}{l}{s}{e}|{e}{l}{s}{e}{i}{f}|{e}{n}{d}{i}{f}|{w}{h}{i}{l}{e}|{d}{o}|{f}{o}{r}|{f}{o}{r}{e}{a}{c}{h}|{b}{r}{e}{a}{k}|{s}{w}{i}{t}{c}{h}|{c}{a}{s}{e}|{c}{o}{n}{t}{i}{n}{u}{e}|{r}{e}{t}{u}{r}{n}|{i}{n}{c}{l}{u}{d}{e}|{g}{o}{t}{o}|require_once|include_once|{f}{u}{n}{c}{t}{i}{o}{n}|{e}{c}{h}{o}|{d}{i}{e})
+/*control_struct  = ({i}{f}|{e}{l}{s}{e}|{e}{l}{s}{e}{i}{f}|{e}{n}{d}{i}{f}|{w}{h}{i}{l}{e}|{d}{o}|{f}{o}{r}|{f}{o}{r}{e}{a}{c}{h}|{b}{r}{e}{a}{k}|{s}{w}{i}{t}{c}{h}|{c}{a}{s}{e}|{c}{o}{n}{t}{i}{n}{u}{e}|{r}{e}{t}{u}{r}{n}|{i}{n}{c}{l}{u}{d}{e}|{g}{o}{t}{o}|require_once|include_once|{f}{u}{n}{c}{t}{i}{o}{n}|{e}{c}{h}{o}|{d}{i}{e})*/
 Semicolon       = ;
 Comma           = ,
 Parenthesis     = \(|\)
@@ -107,50 +94,46 @@ WhiteSpace      = [\s\t\r\v\f]
 
 Point           = \.|\?|:|\\|\"
 
-DataBase        = "['"[a-zA-Z_]*"']"
-Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(.|\n)*)|("=!=")
+Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(\n)*)|("=!=")
 %{
     public String lexeme;
 %}
 
 %%
-{control_struct}    {lexeme=yytext(); return CONTROL_STRUCTURE;}
-{reserved_var}      {lexeme=yytext(); return RESERVED_VARIABLE;}
-{otherrsrvd_var}    {lexeme=yytext(); return OTHERRESERVED_VARIABLE;}
+/*{control_struct}    {lexeme = yytext(); return CONTROL_STRUCTURE;}*/
 
-{Comment}           {lexeme=yytext(); return COMMENT;}
+{Comment}           {lexeme = yytext(); return COMMENT;}
 
-{Newline}           {lexeme=yytext(); return NEWLINE;}
-{WhiteSpace}        {lexeme=yytext(); return WHITESPACE;}
-{Bracket}           {lexeme=yytext(); return BRACKET;}
+{Newline}           {lexeme = yytext(); return NEWLINE;}
+{WhiteSpace}        {lexeme = yytext(); return WHITESPACE;}
+{Bracket}           {lexeme = yytext(); return BRACKET;}
 
-{Parenthesis}       {lexeme=yytext(); return PARENTHESIS;}
-{Brace}             {lexeme=yytext(); return BRACE;}
-{Magic_constant}    {lexeme=yytext(); return CONSTANT;}
-{reserved_words}    {lexeme=yytext(); return RESERVED_WORD;}
+{Parenthesis}       {lexeme = yytext(); return PARENTHESIS;}
+{Brace}             {lexeme = yytext(); return BRACE;}
+{reserved_words}    {lexeme = yytext(); return RESERVED_WORD;}
 
 
 
-{String}            {lexeme=yytext(); return STRING;}
+{String}            {lexeme = yytext(); return STRING;}
 
 
 
-{Comparison_op}     {lexeme=yytext(); return COMPARISON_OPERATOR;}
-{Arithmetic_Op}     {lexeme=yytext(); return ARITHMETIC_OPERATOR;}
-{Logical_Op}        {lexeme=yytext(); return LOGICAL_OPERATOR;}
+{Comparison_op}     {lexeme = yytext(); return COMPARISON_OPERATOR;}
+{Arithmetic_Op}     {lexeme = yytext(); return ARITHMETIC_OPERATOR;}
+{Logical_Op}        {lexeme = yytext(); return LOGICAL_OPERATOR;}
 
-{Integers}          {lexeme=yytext(); return INTEGER;}
-{Double}            {lexeme=yytext(); return DOUBLE;}
+{Integers}          {lexeme = yytext(); return INTEGER;}
+{Double}            {lexeme = yytext(); return DOUBLE;}
 
-{Exponent_Dnum}     {lexeme=yytext(); return FLOATING_POINT_NUM;}
+{Exponent_Dnum}     {lexeme = yytext(); return FLOATING_POINT_NUM;}
 
-{Identifier}        {lexeme=yytext(); return IDENTIFIER;}
+{Identifier}        {lexeme = yytext(); return IDENTIFIER;}
 
-{var_id }           {lexeme=yytext(); return VARIABLE_ID;}
+{var_id }           {lexeme = yytext(); return VARIABLE_ID;}
 
-{Semicolon}         {lexeme=yytext(); return SEMICOLON;}
-{Comma}             {lexeme=yytext(); return COMMA;}
-{Point}               {lexeme = yytext(); return POINT;}
+{Semicolon}         {lexeme = yytext(); return SEMICOLON;}
+{Comma}             {lexeme = yytext(); return COMMA;}
+{Point}             {lexeme = yytext(); return POINT;}
 
 {Errors}            {lexeme = yytext(); return ERROR;}
 .                   {lexeme = yytext(); return ERROR;}
