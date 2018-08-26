@@ -37,7 +37,6 @@ y = [yY]
 z = [zZ]
 
 /*Reserved words*/
-/*reserved_words  = __halt_compiler|abstract|and|array|as|callable|catch|class|clone|const|declare|default|do|empty|enddeclare|endfor|endforeach|endswitch|endwhile|eval|exit|extends|final|global|implements|instanceof|insteadof|interface|isset|list|namespace|new|print|private|protected|public|require|static|throw|trait|try|unset|use|var*/
 reserved_words  = void|int|double|bool|string|class|interface|null|this|extends|implements|for|while|if|else|return|break|New|NewArray
 
 /*Operators*/
@@ -57,7 +56,7 @@ Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
 Integers        = [+-]?{Decimal}|[+-]?{Hexadecimal}|[+-]?{Octal}|[+-]?{Binary}
 Double          = [+-]?([1-9][0-9]*|0)(\.)[0-9]*
-/*Strings*/
+
 /*String          = ('([^(')(\n)(\\')])*')|(\"([^(\")(\n)(\\\")])*\")*/
 String          =('(.)*')|(\"(.)*\")
 
@@ -65,8 +64,6 @@ String          =('(.)*')|(\"(.)*\")
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
                                                       
-/*Control structures*/
-/*control_struct  = ({i}{f}|{e}{l}{s}{e}|{e}{l}{s}{e}{i}{f}|{e}{n}{d}{i}{f}|{w}{h}{i}{l}{e}|{d}{o}|{f}{o}{r}|{f}{o}{r}{e}{a}{c}{h}|{b}{r}{e}{a}{k}|{s}{w}{i}{t}{c}{h}|{c}{a}{s}{e}|{c}{o}{n}{t}{i}{n}{u}{e}|{r}{e}{t}{u}{r}{n}|{i}{n}{c}{l}{u}{d}{e}|{g}{o}{t}{o}|require_once|include_once|{f}{u}{n}{c}{t}{i}{o}{n}|{e}{c}{h}{o}|{d}{i}{e})*/
 Semicolon       = ;
 Comma           = ,
 Parenthesis     = \(|\)
@@ -95,12 +92,15 @@ Point           = \.|\?|:|\\|\"
 
 Constant        = {Booleans}|{Integers}|{Double}|{String}
 Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(\n)*)|("=!=")|(\/\*\n)
+
 %{
     public String lexeme;
 %}
 
 %%
-/*{control_struct}    {lexeme = yytext(); return CONTROL_STRUCTURE;}*/
+
+{reserved_words}    {lexeme = yytext(); return RESERVED_WORD;}
+{Identifier}        {lexeme = yytext(); return IDENTIFIER;}
 
 {Comment}           {lexeme = yytext(); return COMMENT;}
 {Constant}          {lexeme = yytext(); return CONSTANT;}
@@ -111,19 +111,10 @@ Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(\n)*)|("=!=")|(\/\*\n)
 
 {Parenthesis}       {lexeme = yytext(); return PARENTHESIS;}
 {Brace}             {lexeme = yytext(); return BRACE;}
-{reserved_words}    {lexeme = yytext(); return RESERVED_WORD;}
-
 
 {Comparison_op}     {lexeme = yytext(); return COMPARISON_OPERATOR;}
 {Arithmetic_Op}     {lexeme = yytext(); return ARITHMETIC_OPERATOR;}
 {Logical_Op}        {lexeme = yytext(); return LOGICAL_OPERATOR;}
-
-
-{Exponent_Dnum}     {lexeme = yytext(); return FLOATING_POINT_NUM;}
-
-{Identifier}        {lexeme = yytext(); return IDENTIFIER;}
-
-{var_id }           {lexeme = yytext(); return VARIABLE_ID;}
 
 {Semicolon}         {lexeme = yytext(); return SEMICOLON;}
 {Comma}             {lexeme = yytext(); return COMMA;}

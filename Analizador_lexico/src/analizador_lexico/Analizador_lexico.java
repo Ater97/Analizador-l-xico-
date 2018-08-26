@@ -69,37 +69,37 @@ public class Analizador_lexico {
             {
                 case ERROR: 
                     ERRORSNumber++;
-                    result.add(" " + ERRORSNumber+" " + token + " <" + lexer.lexeme+"> in line " + lineNumber);
+                    result.add(" " + token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line " + lineNumber);
                     System.out.println(" "+ ERRORSNumber+" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                     flag_ERROR = true;
                 break;   
                 case RESERVED_WORD:
                     //result.add(lexer.lexeme);
-            result.add(" " + token + "                    => " + lexer.lexeme + " in line " + lineNumber);
+                    result.add(" " + token + "                    => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 case IDENTIFIER:
-         result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
+                    result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 case COMMENT:
-      result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
+                    result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 case CONSTANT:
-       result.add(" " + token + "                         => " + lexer.lexeme + " in line " + lineNumber);
+                    result.add(" " + token + "                         => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 case CONSTANTCOMPARISON_OPERATOR:
-                          result.add(" " + token + "      => " + lexer.lexeme + " in line " + lineNumber);
+                    result.add(" " + token + "      => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 case  ARITHMETIC_OPERATOR:
-                   result.add(" " + token + "              => " + lexer.lexeme + " in line " + lineNumber);
+                    result.add(" " + token + "              => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 case LOGICAL_OPERATOR:
-               result.add(" " + token + "                 => " + lexer.lexeme + " in line " + lineNumber);
+                    result.add(" " + token + "                 => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 default: 
