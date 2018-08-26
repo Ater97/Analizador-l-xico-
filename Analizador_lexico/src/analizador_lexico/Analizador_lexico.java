@@ -42,16 +42,18 @@ public class Analizador_lexico {
         }
         System.exit(0);
     }
+    public static boolean flag_ERROR = false;
+    public static int ERRORSNumber = 0;
     public static void Analyzer() throws FileNotFoundException, IOException
     {
-        boolean flag_ERROR = false;
+        flag_ERROR = false;
         File originalFile = OpenFile();
         Reader reader = new BufferedReader(new FileReader(originalFile.getPath()));
         Lexer lexer = new Lexer(reader);
         ArrayList<String> result = new ArrayList<String>();
 
         int lineNumber =1;
-        int ERRORSNumber=0;
+        ERRORSNumber = 0;
         while(true){
             Token token = lexer.yylex();
             if(token==null){
@@ -63,27 +65,45 @@ public class Analizador_lexico {
             }
             if(lexer.lexeme.contains("\n"))
                 lineNumber++;
-            switch(token)
+            switch(token) //RESERVED_WORD, IDENTIFIER, WHITESPACE, COMMENT, CONSTANT, CONSTANTCOMPARISON_OPERATOR, ARITHMETIC_OPERATOR, LOGICAL_OPERATOR, ERROR
             {
-                case ERROR: result.add(" " + token + " =>" + lexer.lexeme+" ");
+                case ERROR: 
                     ERRORSNumber++;
-                     System.out.println(" "+ ERRORSNumber+" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    result.add(" " + ERRORSNumber+" " + token + " <" + lexer.lexeme+"> in line " + lineNumber);
+                    System.out.println(" "+ ERRORSNumber+" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                     flag_ERROR = true;
                 break;   
-                case CONSTANT:
-                    result.add(lexer.lexeme.toUpperCase());
-                break;
                 case RESERVED_WORD:
-                    result.add(lexer.lexeme.toUpperCase());
+                    //result.add(lexer.lexeme);
+            result.add(" " + token + "                    => " + lexer.lexeme + " in line " + lineNumber);
+                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
-                case RESERVED_VARIABLE:
-                    result.add(lexer.lexeme.toUpperCase());
+                case IDENTIFIER:
+         result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
+                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
-                case CONTROL_STRUCTURE:
-                    result.add(lexer.lexeme.toLowerCase());
+                case COMMENT:
+      result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
+                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                break;
+                case CONSTANT:
+       result.add(" " + token + "                         => " + lexer.lexeme + " in line " + lineNumber);
+                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                break;
+                case CONSTANTCOMPARISON_OPERATOR:
+                          result.add(" " + token + "      => " + lexer.lexeme + " in line " + lineNumber);
+                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                break;
+                case  ARITHMETIC_OPERATOR:
+                   result.add(" " + token + "              => " + lexer.lexeme + " in line " + lineNumber);
+                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                break;
+                case LOGICAL_OPERATOR:
+               result.add(" " + token + "                 => " + lexer.lexeme + " in line " + lineNumber);
+                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 default: 
-                    result.add(lexer.lexeme); //"Token " + token + " "+ lexer.lexeme);
+                    result.add(lexer.lexeme);//"Token " + token + " "+ lexer.lexeme);
                 break;
             }
         }
@@ -98,7 +118,7 @@ public class Analizador_lexico {
     {
         File fileParse = null;
         JFrame parentFrame = new JFrame();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("C# Files", "sc");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("C# Files", "cs");
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Specify a file");  
         fileChooser.setFileFilter(filter);
@@ -107,22 +127,30 @@ public class Analizador_lexico {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             fileParse = fileChooser.getSelectedFile();
             System.out.println("Save as file: " + fileParse.getAbsolutePath());}
+        else
+            System.exit(0);
         return  fileParse;
     }
     
        public static void createOUT(String filename, String path, ArrayList<String> MainList) throws IOException
     {
         path = path.replace(filename, "");
-        filename = filename.replace(".sc", "");  
+        filename = filename.replace(".cs", "");  
         
         File fout = new File(path,filename+".out");
 	FileOutputStream fos = new FileOutputStream(fout);
  
 	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
- 
+        
+        if(flag_ERROR){
+        bw.write("***The file have " + ERRORSNumber + " ERRORS***");
+        bw.newLine();
+        }
+        
 	for (int i = 0; i < MainList.size(); i++) {
+            if(!MainList.get(i).isEmpty() && MainList.get(i) != "" && MainList.get(i) != "\\n" && MainList.get(i) != "\\r"){ 
 		bw.write(MainList.get(i));
-		//bw.newLine();
+		bw.newLine();}
 	}
 	bw.close();
     }

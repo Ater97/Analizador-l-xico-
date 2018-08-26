@@ -85,16 +85,16 @@ Exponent_Dnum   = [+-]?(({Lnum} | {Dnum}) [eE][+-]? {Lnum})
 
 
 Identifier      = ((_)*)?[a-zA-Z][a-zA-Z0-9_]*
-/*("<"{h}{t}{m}{l}">"~"</"{h}{t}{m}{l}">")*/
-Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|(#(.)*)|[0-9]*"pt"
 
-php             = "<\?php"|"\?>"
+Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|[0-9]*"pt"
+
 Newline         = \n
 WhiteSpace      = [\s\t\r\v\f]
 
 Point           = \.|\?|:|\\|\"
 
-Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(\n)*)|("=!=")
+Constant        = {Booleans}|{Integers}|{Double}|{String}
+Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(\n)*)|("=!=")|(\/\*\n)
 %{
     public String lexeme;
 %}
@@ -103,6 +103,7 @@ Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(\n)*)|("=!=")
 /*{control_struct}    {lexeme = yytext(); return CONTROL_STRUCTURE;}*/
 
 {Comment}           {lexeme = yytext(); return COMMENT;}
+{Constant}          {lexeme = yytext(); return CONSTANT;}
 
 {Newline}           {lexeme = yytext(); return NEWLINE;}
 {WhiteSpace}        {lexeme = yytext(); return WHITESPACE;}
@@ -113,17 +114,10 @@ Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(\n)*)|("=!=")
 {reserved_words}    {lexeme = yytext(); return RESERVED_WORD;}
 
 
-
-{String}            {lexeme = yytext(); return STRING;}
-
-
-
 {Comparison_op}     {lexeme = yytext(); return COMPARISON_OPERATOR;}
 {Arithmetic_Op}     {lexeme = yytext(); return ARITHMETIC_OPERATOR;}
 {Logical_Op}        {lexeme = yytext(); return LOGICAL_OPERATOR;}
 
-{Integers}          {lexeme = yytext(); return INTEGER;}
-{Double}            {lexeme = yytext(); return DOUBLE;}
 
 {Exponent_Dnum}     {lexeme = yytext(); return FLOATING_POINT_NUM;}
 
