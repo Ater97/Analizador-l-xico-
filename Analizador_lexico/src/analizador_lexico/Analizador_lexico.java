@@ -69,8 +69,8 @@ public class Analizador_lexico {
             {
                 case ERROR: 
                     ERRORSNumber++;
-                    result.add(" " + token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line " + lineNumber);
-                    System.out.println(" "+ ERRORSNumber+" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    result.add(" ***" + token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line " + lineNumber + "***");
+                    System.out.println(" "+ token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line "+ lineNumber);
                     flag_ERROR = true;
                 break;   
                 case RESERVED_WORD:
@@ -102,8 +102,13 @@ public class Analizador_lexico {
                     result.add(" " + token + "                 => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
+                case PUNCTUATION:
+          result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
+                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                break;
                 default: 
-                    result.add(lexer.lexeme);//"Token " + token + " "+ lexer.lexeme);
+                    if(lexer.lexeme.equals(""))
+                        result.add(lexer.lexeme);//"Token " + token + " "+ lexer.lexeme);
                 break;
             }
         }
@@ -140,28 +145,23 @@ public class Analizador_lexico {
         File fout = new File(path,filename+".out");
 	FileOutputStream fos = new FileOutputStream(fout);
  
-	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-        
-        if(flag_ERROR){
-        bw.write("***The file have " + ERRORSNumber + " ERRORS***");
-        bw.newLine();
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))) {
+            if(flag_ERROR){
+                bw.write("***The file have " + ERRORSNumber + " ERRORS***");
+                bw.newLine();
+            }
+            
+            for (int i = 0; i < MainList.size(); i++) {
+                if(!MainList.get(i).equals("\r") && !MainList.get(i).isEmpty() && !MainList.get(i).equals("") && !MainList.get(i).equals("\n")){
+                    bw.write(MainList.get(i));
+                    bw.newLine();}
+            }
         }
-        
-	for (int i = 0; i < MainList.size(); i++) {
-            if(!MainList.get(i).isEmpty() && MainList.get(i) != "" && MainList.get(i) != "\\n" && MainList.get(i) != "\\r"){ 
-		bw.write(MainList.get(i));
-		bw.newLine();}
-	}
-	bw.close();
     }
-         public static boolean stay()
+       public static boolean stay()
     {
         int dialogButton = JOptionPane.YES_NO_OPTION;
         int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to continue?","",dialogButton);
-        if(dialogResult == JOptionPane.YES_OPTION){
-            return true;
-        }
-        return false;
-    }
-    
+        return dialogResult == JOptionPane.YES_OPTION;
+    } 
 }
