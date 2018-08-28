@@ -20,7 +20,7 @@ Arithmetic_Op   = \+|\-|\*|\/|\%|\*\*|"="
 Logical_Op      = ["and"|"or"|"xor"|"!"|"&&"|\|\|]+
 
 /*Types*/
-Booleans        =true|false|True|False|TRUE|FALSE
+Booleans        =true|false
 Decimal         = [1-9][0-9]*|0
 Hexadecimal     = 0[xX][0-9a-fA-F]+
 Octal           = 0[0-7]+
