@@ -63,7 +63,8 @@ Point           = \.|\?|:|\\|\"
 
 Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|[]
 Constant        ={Booleans}|{Integers}|{Double}|{String}
-Errors          = ("$"?[0-9]*[a-zA-Z0-9]*)|(("\/\*")(\n)*)|("=!=")|(\/\*\n)
+/*("$"?[0-9]*[a-zA-Z0-9]*)|("=!=")*/
+Errors          = (("\/\*")(\n)*)|(\/\*\n)
 
 %{
     public String lexeme;
