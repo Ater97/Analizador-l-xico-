@@ -79,11 +79,18 @@ public class Analizador_lexico {
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 case IDENTIFIER:
-                    result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
-                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    if(lexer.lexeme.length()<32){
+                        result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
+                    else{
+                        ERRORSNumber++;
+                        String temp = lexer.lexeme.substring(0, 30);
+                        result.add(" ***ERROR " + ERRORSNumber + " IDENTIFIER LENGTH ERROR <" + temp + "> in line " + lineNumber + "***");
+                        System.out.println("ERROR " + ERRORSNumber + " IDENTIFIER LENGTH ERROR  <" + temp + "> in line "+ lineNumber);
+                    }
                 break;
                 case COMMENT:
-                    result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
+                    //result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
                     System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                 break;
                 case CONSTANT:
@@ -147,7 +154,10 @@ public class Analizador_lexico {
  
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))) {
             if(flag_ERROR){
-                bw.write("***The file have " + ERRORSNumber + " ERRORS***");
+                if(ERRORSNumber==1)
+                    bw.write("***The file have " + ERRORSNumber + " ERROR***");
+                else
+                    bw.write("***The file have " + ERRORSNumber + " ERRORS***");
                 bw.newLine();
             }
             
