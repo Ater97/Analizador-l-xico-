@@ -83,8 +83,8 @@ public class Analizador_lexico {
                     {
                         tempLineNumber++;
                         tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
                     }
                     if(comment_ERROR_Flag){
                         ERRORSNumber++;
@@ -103,8 +103,8 @@ public class Analizador_lexico {
                     {
                         tempLineNumber++;
                         tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
+                        lenghtA =1;
+                        lenghtB= tempLinestr.length();
                     }
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "                    => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
@@ -121,8 +121,8 @@ public class Analizador_lexico {
                     {
                         tempLineNumber++;
                         tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
                     }
                     if(comment_ERROR_Flag){
                         if(lexer.lexeme.length()<32){
@@ -159,8 +159,8 @@ public class Analizador_lexico {
                     {
                         tempLineNumber++;
                         tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
                     }
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "                         => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
@@ -177,8 +177,8 @@ public class Analizador_lexico {
                     {
                         tempLineNumber++;
                         tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
                     }
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "      => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
@@ -195,8 +195,8 @@ public class Analizador_lexico {
                     {
                         tempLineNumber++;
                         tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
                     }
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "              => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
@@ -213,8 +213,8 @@ public class Analizador_lexico {
                     {
                         tempLineNumber++;
                         tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
                     }
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "                 => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
@@ -231,27 +231,14 @@ public class Analizador_lexico {
                     {
                         tempLineNumber++;
                         tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
                     }
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
                         System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);}
                 break;
                 default: 
-                    if(lineNumber == tempLineNumber)
-                    {
-                        lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme.trim();
-                        lenghtB = tempLinestr.length();
-                    }
-                    else
-                    {
-                        tempLineNumber++;
-                        tempLinestr = lexer.lexeme.trim();
-                        lenghtA =0;
-                        lenghtB =0;
-                    }
                     if(lexer.lexeme.equals(""))
                         result.add(lexer.lexeme);//"Token " + token + " "+ lexer.lexeme);
                 break;
