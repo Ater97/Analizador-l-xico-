@@ -62,7 +62,7 @@ WhiteSpace      = [\s\t\r\v\f]
 
 Point           = \.|\?|:|\\
 
-Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}
+Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|"[]"|"{}"|"()"
 Constant        ={Booleans}|{Integers}|{Double}|{String}
 /*("$"?[0-9]*[a-zA-Z0-9]*)|("=!=")*/
 
