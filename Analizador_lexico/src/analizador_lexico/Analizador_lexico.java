@@ -143,8 +143,8 @@ public class Analizador_lexico {
                 case COMMENT_ERROR:
                     if(comment_ERROR_Flag){
                         ERRORSNumber++;
-                       // result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
-                       // System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                        result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
                         comment_ERROR_Flag = false;
                         flag_ERROR = true;}
                 break;
