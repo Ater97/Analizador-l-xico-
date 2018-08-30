@@ -72,9 +72,6 @@ public class Analizador_lexico {
                 case NEWLINES:
                     lineNumber++;
                     break;
-                case NEWLINE:
-                    //lineNumber++;
-                    break;
                 case ERROR: 
                     if(lineNumber == tempLineNumber)
                     {

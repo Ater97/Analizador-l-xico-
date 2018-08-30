@@ -57,7 +57,7 @@ Identifier      = ((_)*)?[a-zA-Z][a-zA-Z0-9_]*
 Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|[0-9]*"pt"|(\/\*)(.)*(\*\/)|"/*"([^\*]|\*[^/])"*/"|"/*"(.)"*/"
 
 Newline         = \n
-NewLines        ={Newline}+
+NewLines        ={Newline}+|{Newline}({Newline}|{WhiteSpace}|" ")*
 WhiteSpace      = [\s\t\r\v\f]
 
 Point           = \.|\?|:|\\
