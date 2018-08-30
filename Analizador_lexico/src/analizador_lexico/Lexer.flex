@@ -57,11 +57,12 @@ Identifier      = ((_)*)?[a-zA-Z][a-zA-Z0-9_]*
 Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|[0-9]*"pt"|(\/\*)(.)*(\*\/)|"/*"([^\*]|\*[^/])"*/"|"/*"(.)"*/"
 
 Newline         = \n
+NewLines        ={Newline}+
 WhiteSpace      = [\s\t\r\v\f]
 
 Point           = \.|\?|:|\\
 
-Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|[]
+Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}
 Constant        ={Booleans}|{Integers}|{Double}|{String}
 /*("$"?[0-9]*[a-zA-Z0-9]*)|("=!=")*/
 
@@ -70,25 +71,27 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 %{
     public String lexeme;
+    public int line;
 %}
 
 %%
 
-{reserved_words}    {lexeme = yytext(); return RESERVED_WORD;}
-{Constant}          {lexeme = yytext(); return CONSTANT;}
-{Identifier}        {lexeme = yytext(); return IDENTIFIER;}
+{reserved_words}    {lexeme = yytext(); line = yyline;return RESERVED_WORD;}
+{Constant}          {lexeme = yytext(); line = yyline;return CONSTANT;}
+{Identifier}        {lexeme = yytext(); line = yyline;return IDENTIFIER;}
 
-{Comment}           {lexeme = yytext(); return COMMENT;}
+{Comment}           {lexeme = yytext(); line = yyline;return COMMENT;}
 
 
-{Newline}           {lexeme = yytext(); return NEWLINE;}
-{WhiteSpace}        {lexeme = yytext(); return WHITESPACE;}
+{NewLines}          {lexeme = yytext(); line = yyline;return NEWLINES;}
+{Newline}           {lexeme = yytext(); line = yyline;return NEWLINE;}
+{WhiteSpace}        {lexeme = yytext(); line = yyline;return WHITESPACE;}
 
-{Punctuation}       {lexeme = yytext(); return PUNCTUATION;} 
-{Comparison_op}     {lexeme = yytext(); return COMPARISON_OPERATOR;}
-{Arithmetic_Op}     {lexeme = yytext(); return ARITHMETIC_OPERATOR;}
-{Logical_Op}        {lexeme = yytext(); return LOGICAL_OPERATOR;}
+{Punctuation}       {lexeme = yytext(); line = yyline;return PUNCTUATION;} 
+{Comparison_op}     {lexeme = yytext(); line = yyline;return COMPARISON_OPERATOR;}
+{Arithmetic_Op}     {lexeme = yytext(); line = yyline;return ARITHMETIC_OPERATOR;}
+{Logical_Op}        {lexeme = yytext(); line = yyline;return LOGICAL_OPERATOR;}
 
-{CommentError}      {lexeme = yytext(); return COMMENT_ERROR;}
-{Errors}            {lexeme = yytext(); return ERROR;}
-.                   {lexeme = yytext(); return ERROR;}
+{CommentError}      {lexeme = yytext();line = yyline; return COMMENT_ERROR;}
+{Errors}            {lexeme = yytext(); line = yyline; return ERROR;}
+.                   {lexeme = yytext(); line = yyline;return ERROR;}

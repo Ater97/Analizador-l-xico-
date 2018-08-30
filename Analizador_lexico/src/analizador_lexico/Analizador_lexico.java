@@ -65,10 +65,16 @@ public class Analizador_lexico {
                     createOUT(originalFile.getName(),originalFile.getPath(),result);
                 return;
             }
-            if(lexer.lexeme.contains("\n"))
-                lineNumber++;
+            //if(lexer.lexeme.contains("\n"))
+              //  lineNumber++;
             switch(token) //RESERVED_WORD, IDENTIFIER, WHITESPACE, COMMENT, CONSTANT, CONSTANTCOMPARISON_OPERATOR, ARITHMETIC_OPERATOR, LOGICAL_OPERATOR, ERROR
             {
+                case NEWLINES:
+                    lineNumber++;
+                    break;
+                case NEWLINE:
+                    //lineNumber++;
+                    break;
                 case ERROR: 
                     if(lineNumber == tempLineNumber)
                     {
@@ -85,7 +91,7 @@ public class Analizador_lexico {
                     }
                     if(comment_ERROR_Flag){
                         ERRORSNumber++;
-                        result.add(" ***" + token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line " + lineNumber + "***" );
+                        result.add(" ***" + token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line " +  lineNumber + "***" );
                         System.out.println(" "+ token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);
                         flag_ERROR = true;}
                 break;   
