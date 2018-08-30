@@ -73,35 +73,33 @@ public class Analizador_lexico {
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
                     if(comment_ERROR_Flag){
                         ERRORSNumber++;
                         result.add(" ***" + token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line " + lineNumber + "***" );
-                        System.out.println(" "+ token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                        System.out.println(" "+ token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);
                         flag_ERROR = true;}
                 break;   
                 case RESERVED_WORD:
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
@@ -113,14 +111,13 @@ public class Analizador_lexico {
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
@@ -152,14 +149,13 @@ public class Analizador_lexico {
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
@@ -171,14 +167,13 @@ public class Analizador_lexico {
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
@@ -190,14 +185,13 @@ public class Analizador_lexico {
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
@@ -209,14 +203,13 @@ public class Analizador_lexico {
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
@@ -228,14 +221,13 @@ public class Analizador_lexico {
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
@@ -247,14 +239,13 @@ public class Analizador_lexico {
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
-                        tempLinestr += lexer.lexeme;
+                        tempLinestr += lexer.lexeme.trim();
                         lenghtB = tempLinestr.length();
                     }
                     else
                     {
                         tempLineNumber++;
-                        tempLinestr ="";
-                        tempLinestr = lexer.lexeme;
+                        tempLinestr = lexer.lexeme.trim();
                         lenghtA =0;
                         lenghtB =0;
                     }
