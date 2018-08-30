@@ -56,7 +56,7 @@ public class Analizador_lexico {
         int lineNumber = 1;
         int tempLineNumber =1;
         String tempLinestr = "";
-        int lenghtA = 1;
+        int lenghtA = 1 ;
         int lenghtB = 0;
         ERRORSNumber = 0;
         while(true){
