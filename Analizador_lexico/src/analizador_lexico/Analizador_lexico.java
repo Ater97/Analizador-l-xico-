@@ -44,6 +44,7 @@ public class Analizador_lexico {
     }
     public static boolean flag_ERROR = false;
     public static int ERRORSNumber = 0;
+    public static boolean comment_ERROR_Flag = true;
     public static void Analyzer() throws FileNotFoundException, IOException
     {
         flag_ERROR = false;
@@ -57,10 +58,7 @@ public class Analizador_lexico {
         while(true){
             Token token = lexer.yylex();
             if(token==null){
-                //result.add("END");
-               // if(!flag_ERROR){
                     createOUT(originalFile.getName(),originalFile.getPath(),result);
-                //}
                 return;
             }
             if(lexer.lexeme.contains("\n"))
@@ -68,50 +66,66 @@ public class Analizador_lexico {
             switch(token) //RESERVED_WORD, IDENTIFIER, WHITESPACE, COMMENT, CONSTANT, CONSTANTCOMPARISON_OPERATOR, ARITHMETIC_OPERATOR, LOGICAL_OPERATOR, ERROR
             {
                 case ERROR: 
-                    ERRORSNumber++;
-                    result.add(" ***" + token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line " + lineNumber + "***");
-                    System.out.println(" "+ token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line "+ lineNumber);
-                    flag_ERROR = true;
+                    if(comment_ERROR_Flag){
+                        ERRORSNumber++;
+                        result.add(" ***" + token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line " + lineNumber + "***");
+                        System.out.println(" "+ token + " " + ERRORSNumber + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                        flag_ERROR = true;}
                 break;   
                 case RESERVED_WORD:
-                    //result.add(lexer.lexeme);
-                    result.add(" " + token + "                    => " + lexer.lexeme + " in line " + lineNumber);
-                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    if(comment_ERROR_Flag){
+                        result.add(" " + token + "                    => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
                 break;
                 case IDENTIFIER:
-                    if(lexer.lexeme.length()<32){
-                        result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
-                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
-                    else{
-                        ERRORSNumber++;
-                        String temp = lexer.lexeme.substring(0, 30);
-                        result.add(" ***ERROR " + ERRORSNumber + " IDENTIFIER LENGTH ERROR <" + temp + "> in line " + lineNumber + "***");
-                        System.out.println("ERROR " + ERRORSNumber + " IDENTIFIER LENGTH ERROR  <" + temp + "> in line "+ lineNumber);
+                    if(comment_ERROR_Flag){
+                        if(lexer.lexeme.length()<32){
+                            result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
+                            System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
+                        else{
+                            ERRORSNumber++;
+                            String temp = lexer.lexeme.substring(0, 30);
+                            result.add(" ***ERROR " + ERRORSNumber + " IDENTIFIER LENGTH ERROR <" + temp + "> in line " + lineNumber + "***");
+                            System.out.println("ERROR " + ERRORSNumber + " IDENTIFIER LENGTH ERROR  <" + temp + "> in line "+ lineNumber);
+                        }
                     }
                 break;
                 case COMMENT:
                     //result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
-                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    //System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                break;
+                case COMMENT_ERROR:
+                    if(comment_ERROR_Flag){
+                        ERRORSNumber++;
+                        result.add(" " + token + "                          => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                        comment_ERROR_Flag = false;
+                        flag_ERROR = true;}
                 break;
                 case CONSTANT:
-                    result.add(" " + token + "                         => " + lexer.lexeme + " in line " + lineNumber);
-                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    if(comment_ERROR_Flag){
+                        result.add(" " + token + "                         => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
                 break;
                 case CONSTANTCOMPARISON_OPERATOR:
-                    result.add(" " + token + "      => " + lexer.lexeme + " in line " + lineNumber);
-                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    if(comment_ERROR_Flag){
+                        result.add(" " + token + "      => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
                 break;
                 case  ARITHMETIC_OPERATOR:
-                    result.add(" " + token + "              => " + lexer.lexeme + " in line " + lineNumber);
-                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    if(comment_ERROR_Flag){
+                        result.add(" " + token + "              => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
                 break;
                 case LOGICAL_OPERATOR:
-                    result.add(" " + token + "                 => " + lexer.lexeme + " in line " + lineNumber);
-                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    if(comment_ERROR_Flag){
+                        result.add(" " + token + "                 => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
                 break;
                 case PUNCTUATION:
-          result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
-                    System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);
+                    if(comment_ERROR_Flag){
+                        result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber);
+                        System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber);}
                 break;
                 default: 
                     if(lexer.lexeme.equals(""))
@@ -170,6 +184,9 @@ public class Analizador_lexico {
     }
        public static boolean stay()
     {
+        flag_ERROR = false;
+        ERRORSNumber = 0;
+        comment_ERROR_Flag = true;
         int dialogButton = JOptionPane.YES_NO_OPTION;
         int dialogResult = JOptionPane.showConfirmDialog (null, "Would You Like to continue?","",dialogButton);
         return dialogResult == JOptionPane.YES_OPTION;

@@ -54,17 +54,19 @@ Exponent_Dnum   = [+-]?(({Lnum} | {Dnum}) [eE][+-]? {Lnum})
 
 Identifier      = ((_)*)?[a-zA-Z][a-zA-Z0-9_]*
 
-Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|[0-9]*"pt"
+Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|[0-9]*"pt"|(\/\*)(.)*(\*\/)|"/*"([^\*]|\*[^/])"*/"|"/*"(.)"*/"
 
 Newline         = \n
 WhiteSpace      = [\s\t\r\v\f]
 
-Point           = \.|\?|:|\\|\"
+Point           = \.|\?|:|\\
 
 Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|[]
 Constant        ={Booleans}|{Integers}|{Double}|{String}
 /*("$"?[0-9]*[a-zA-Z0-9]*)|("=!=")*/
-Errors          = (("\/\*")(\n)*)|(\/\*\n)
+
+CommentError    = (\/\*)(.)
+Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 %{
     public String lexeme;
@@ -87,5 +89,6 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)
 {Arithmetic_Op}     {lexeme = yytext(); return ARITHMETIC_OPERATOR;}
 {Logical_Op}        {lexeme = yytext(); return LOGICAL_OPERATOR;}
 
+{CommentError}      {lexeme = yytext(); return COMMENT_ERROR;}
 {Errors}            {lexeme = yytext(); return ERROR;}
 .                   {lexeme = yytext(); return ERROR;}
