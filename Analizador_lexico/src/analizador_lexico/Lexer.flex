@@ -26,7 +26,7 @@ Hexadecimal     = 0[xX][0-9a-fA-F]+
 Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
 Integers        = [+-]?{Decimal}|[+-]?{Hexadecimal}|[+-]?{Octal}|[+-]?{Binary}
-Double          = [+-]?([1-9][0-9]*|0)(\.)[0-9]*
+Double          = [+-]?([1-9][0-9]*|0)(\.)[0-9]*|{Exponent_Dnum}|[+-]?(({Lnum}|{Dnum})\.[eE][+-]? {Lnum})
 
 /*String          = ('([^(')(\n)(\\')])*')|(\"([^(\")(\n)(\\\")])*\")*/
 /*String          =('(.)*')|(\"(.)*\")*/    
@@ -77,11 +77,14 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 %%
 
 {reserved_words}    {lexeme = yytext(); line = yyline;return RESERVED_WORD;}
-{Constant}          {lexeme = yytext(); line = yyline;return CONSTANT;}
 {Identifier}        {lexeme = yytext(); line = yyline;return IDENTIFIER;}
 
 {Comment}           {lexeme = yytext(); line = yyline;return COMMENT;}
 
+{Integers}          {lexeme=yytext(); return INTEGER;}
+{Double}            {lexeme=yytext(); return DOUBLE;}
+{String}            {lexeme=yytext(); return STRING;}
+/*{Constant}          {lexeme = yytext(); line = yyline;return CONSTANT;}*/
 
 {NewLines}          {lexeme = yytext(); line = yyline;return NEWLINES;}
 {Newline}           {lexeme = yytext(); line = yyline;return NEWLINE;}

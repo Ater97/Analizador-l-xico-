@@ -148,7 +148,7 @@ public class Analizador_lexico {
                         comment_ERROR_Flag = false;
                         flag_ERROR = true;}
                 break;
-                case CONSTANT:
+                /*case CONSTANT:
                     if(lineNumber == tempLineNumber)
                     {
                         lenghtA = tempLinestr.length();
@@ -165,7 +165,7 @@ public class Analizador_lexico {
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "                         => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
                         System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);}
-                break;
+                break;*/
                 case CONSTANTCOMPARISON_OPERATOR:
                     if(lineNumber == tempLineNumber)
                     {
@@ -237,6 +237,60 @@ public class Analizador_lexico {
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "                       => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
                         System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);}
+                break;
+                case DOUBLE:
+                    if(lineNumber == tempLineNumber)
+                    {
+                        lenghtA = tempLinestr.length();
+                        tempLinestr += lexer.lexeme.trim();
+                        lenghtB = tempLinestr.length();
+                    }
+                    else
+                    {
+                        tempLineNumber++;
+                        tempLinestr = lexer.lexeme.trim();
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
+                    }
+                    if(comment_ERROR_Flag){
+                        result.add(" CONSTANT " + token + "                       => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
+                        System.out.println(" CONSTANT " + token + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);}
+                break;
+                case INTEGER:
+                    if(lineNumber == tempLineNumber)
+                    {
+                        lenghtA = tempLinestr.length();
+                        tempLinestr += lexer.lexeme.trim();
+                        lenghtB = tempLinestr.length();
+                    }
+                    else
+                    {
+                        tempLineNumber++;
+                        tempLinestr = lexer.lexeme.trim();
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
+                    }
+                    if(comment_ERROR_Flag){
+                        result.add(" CONSTANT " + token + "                       => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
+                        System.out.println(" CONSTANT " + token + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);}
+                break;
+                case STRING:
+                    if(lineNumber == tempLineNumber)
+                    {
+                        lenghtA = tempLinestr.length();
+                        tempLinestr += lexer.lexeme.trim();
+                        lenghtB = tempLinestr.length();
+                    }
+                    else
+                    {
+                        tempLineNumber++;
+                        tempLinestr = lexer.lexeme.trim();
+                        lenghtA =1;
+                        lenghtB = tempLinestr.length();
+                    }
+                    if(comment_ERROR_Flag){
+                        result.add(" CONSTANT " + token + "                       => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
+                        System.out.println(" CONSTANT " + token + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);}
                 break;
                 default: 
                     if(lexer.lexeme.equals(""))
