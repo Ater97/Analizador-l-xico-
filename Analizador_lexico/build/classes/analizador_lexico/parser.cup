@@ -1,6 +1,7 @@
 package analizador_lexico;
 
 import java_cup.runtime.*;
+import java.util.*;
 
 init with {: scanner.init();              :};
 scan with {: return scanner.next_token(); :};
@@ -23,7 +24,7 @@ Program             ::= Decl
 Decl                ::= VariableDecl
                       | FunctionDecl
                       | ClassDecl
-                      | InterfaceDecl
+                      | InterfaceDecl;
 VaciableDecl        ::= Variable Semicolon;
 Variable            ::= Type ident;
 Type                ::= int

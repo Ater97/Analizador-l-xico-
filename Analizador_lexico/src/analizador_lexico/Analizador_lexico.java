@@ -52,7 +52,8 @@ public class Analizador_lexico {
         flag_ERROR = false;
         File originalFile = OpenFile();
         Reader reader = new BufferedReader(new FileReader(originalFile.getPath()));
-        Lexer lexer = new Lexer(reader);
+        //Lexer lexer = new Lexer(reader);
+        //Yylex lexer = new Yylex(reader);
         ArrayList<String> result = new ArrayList<String>();
 
         int lineNumber = 1;

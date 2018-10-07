@@ -89,33 +89,31 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 %%
 
-{reserved_words}    {lexeme = yytext(); line = yyline;return new Symbol(sym.reserved_word);} 
-{Identifier}        {lexeme = yytext(); line = yyline;return new Symbol(sym.Identifier);} 
+{reserved_words}    {return new Symbol(sym.reserved_words);} 
+{Identifier}        {return new Symbol(sym.Identifier);} 
 
-/*{Comment}           {lexeme = yytext(); line = yyline;return new Symbol(sym.Comment);)*/
+{Comment}           { return new Symbol(sym.Comment);}
 
-{Integers}          {lexeme=yytext(); return new Symbol(sym.Integers);}
-{Double}            {lexeme=yytext(); return new Symbol(sym.Double);}
-{String}            {lexeme=yytext(); return new Symbol(sym.String);}
+{Integers}          { return new Symbol(sym.Integers);}
+{Double}            { return new Symbol(sym.Double);}
+{String}            { return new Symbol(sym.String);}
 
-/*{Constant}          {lexeme = yytext(); line = yyline;return CONSTANT;}*/
+{NewLines}          {return new Symbol(sym.NewLines);}
+{Newline}           {return new Symbol(sym.NewLine);}
+/*{WhiteSpace}        {return WHITESPACE;}*/
 
-{NewLines}          {lexeme = yytext(); line = yyline;return new Symbol(sym.NewLines);}
-{Newline}           {lexeme = yytext(); line = yyline;return new Symbol(sym.NewLine);}
-/*{WhiteSpace}        {lexeme = yytext(); line = yyline;return WHITESPACE;}*/
+{Punctuation}       {return new Symbol(sym.Punctuation);}
+{Comparison_op}     {return new Symbol(sym.Comparison_op);}
+{Arithmetic_Op}     {return new Symbol(sym.Arithmetic_op);}
+{Logical_Op}        {return new Symbol(sym.Logical_Op);}
 
-{Punctuation}       {lexeme = yytext(); line = yyline;return new Symbol(sym.Punctuation);}
-{Comparison_op}     {lexeme = yytext(); line = yyline;return new Symbol(sym.Comparison_op);}
-{Arithmetic_Op}     {lexeme = yytext(); line = yyline;return new Symbol(sym.Arithmetic_op);}
-{Logical_Op}        {lexeme = yytext(); line = yyline;return new Symbol(sym.Logical_Op);}
+{LeftParenthesis}   {return new Symbol(sym.LeftParenthesis);}
+{RightParenthesis}  {return new Symbol(sym.RightParenthesis);}
+{LeftBrace}         {return new Symbol(sym.LeftBrace);}
+{RightBrace}        {return new Symbol(sym.RightBrace);}
+{LeftBracket}       {return new Symbol(sym.LeftBracket);}
+{RightBracket}      {return new Symbol(sym.RightBracket);}
 
-{LeftParenthesis}   {lexeme = yytext(); line = yyline;return new Symbol(sym.LeftParenthesis);}
-{RightParenthesis}  {lexeme = yytext(); line = yyline;return new Symbol(sym.RightParenthesis);}
-{LeftBrace}         {lexeme = yytext(); line = yyline;return new Symbol(sym.LeftBrace);}
-{RightBrace}        {lexeme = yytext(); line = yyline;return new Symbol(sym.RightBrace);}
-{LeftBracket}       {lexeme = yytext(); line = yyline;return new Symbol(sym.LeftBracket);}
-{RightBracket}      {lexeme = yytext(); line = yyline;return new Symbol(sym.RightBracket);}
-
-{CommentError}      {lexeme = yytext();line = yyline; return new Symbol(sym.CommentError);}
-{Errors}            {lexeme = yytext(); line = yyline; return new Symbol(sym.Errors);}
-/*.                   {lexeme = yytext(); line = yyline;return ERROR;}*/
+{CommentError}      { return new Symbol(sym.CommentError);}
+{Errors}            { return new Symbol(sym.Errors);}
+/*.                   {return ERROR;}*/

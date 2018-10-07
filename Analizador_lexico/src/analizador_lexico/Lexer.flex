@@ -89,16 +89,14 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 %%
 
-{reserved_words}    {return new Symbol(sym.reserved_word);} 
+{reserved_words}    {return new Symbol(sym.reserved_words);} 
 {Identifier}        {return new Symbol(sym.Identifier);} 
 
-{Comment}           { line = yyline;return new Symbol(sym.Comment);)
+{Comment}           { return new Symbol(sym.Comment);}
 
 {Integers}          { return new Symbol(sym.Integers);}
 {Double}            { return new Symbol(sym.Double);}
 {String}            { return new Symbol(sym.String);}
-
-/*{Constant}          { line = yyline;return CONSTANT;}*/
 
 {NewLines}          {return new Symbol(sym.NewLines);}
 {Newline}           {return new Symbol(sym.NewLine);}
