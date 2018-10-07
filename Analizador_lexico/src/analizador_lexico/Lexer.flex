@@ -1,21 +1,27 @@
 package analizador_lexico;
 
-import static analizador_lexico.Token.*;
+import java_cup.runtime.Symbol;
+
 %%
-%class Lexer
-%type Token
+/*%class Lexer*/
 %line
 %column
-/*%ignorecase*/
-
+%cup
+%cupdebug 
 
 /*Reserved words*/
-reserved_words  =void|int|double|bool|string|class|interface|null|this|extends|implements|for|while|if|else|return|break|New|NewArray
+reserved_words  = void|Void|int|double|bool|string|class|interface|null|this|extends|implements|for|while|if|else|return|break|New|NewArray|Print|ReadInteger|ReadLine|Malloc 
 
 /*Operators*/
-Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"==="|"<>"|"<=>"|"??"
+/*  (, ), +, -, *, /, %, <, <=, >, >=, ==, !=, &&, ||, !  */
+
+Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"||" 
+ 
+/*  |"==="|"<>"|"<=>"|"??"   */
 /*Arithmetic*/
-Arithmetic_Op   = \+|\-|\*|\/|\%|\*\*|"="
+Equal           = "="
+Negation        = "!"|"-"
+Arithmetic_Op   = \+|\-|\*|\/|\%|"="
 /*Logic*/
 Logical_Op      = ["and"|"or"|"xor"|"!"|"&&"|\|\|]+
 
@@ -34,13 +40,20 @@ Double          = [+-]?([1-9][0-9]*|0)(\.)[0-9]*|{Exponent_Dnum}|[+-]?(({Lnum}|{
 /*Vars*/
 Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
-                                                      
+               
+Point           = \.                                       
 Semicolon       = ;
 Comma           = ,
-Parenthesis     = \(|\)
-Brace           = \[|\]
-Bracket         = [\{|\}]*
-String          =('(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket})*')|(\"(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket})*\")
+RightParenthesis= \)
+LeftParenthesis = \(
+Parenthesis     = {LeftParenthesis}|{RightParenthesis}
+RightBrace      = \]
+LeftBrace       = \[
+Brace           = {LeftBrace}|{RightBrace}
+RightBracket    = \}
+LeftBracket     = \{
+Bracket         = {LeftBracket}|{RightBracket}
+String          =('(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|{Point})*')|(\"(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket})*\")
 
 
 /*Functions*/
@@ -76,25 +89,33 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 %%
 
-{reserved_words}    {lexeme = yytext(); line = yyline;return RESERVED_WORD;}
-{Identifier}        {lexeme = yytext(); line = yyline;return IDENTIFIER;}
+{reserved_words}    {return new Symbol(sym.reserved_word);} 
+{Identifier}        {return new Symbol(sym.Identifier);} 
 
-{Comment}           {lexeme = yytext(); line = yyline;return COMMENT;}
+{Comment}           { line = yyline;return new Symbol(sym.Comment);)
 
-{Integers}          {lexeme=yytext(); return INTEGER;}
-{Double}            {lexeme=yytext(); return DOUBLE;}
-{String}            {lexeme=yytext(); return STRING;}
-/*{Constant}          {lexeme = yytext(); line = yyline;return CONSTANT;}*/
+{Integers}          { return new Symbol(sym.Integers);}
+{Double}            { return new Symbol(sym.Double);}
+{String}            { return new Symbol(sym.String);}
 
-{NewLines}          {lexeme = yytext(); line = yyline;return NEWLINES;}
-{Newline}           {lexeme = yytext(); line = yyline;return NEWLINE;}
-{WhiteSpace}        {lexeme = yytext(); line = yyline;return WHITESPACE;}
+/*{Constant}          { line = yyline;return CONSTANT;}*/
 
-{Punctuation}       {lexeme = yytext(); line = yyline;return PUNCTUATION;} 
-{Comparison_op}     {lexeme = yytext(); line = yyline;return COMPARISON_OPERATOR;}
-{Arithmetic_Op}     {lexeme = yytext(); line = yyline;return ARITHMETIC_OPERATOR;}
-{Logical_Op}        {lexeme = yytext(); line = yyline;return LOGICAL_OPERATOR;}
+{NewLines}          {return new Symbol(sym.NewLines);}
+{Newline}           {return new Symbol(sym.NewLine);}
+/*{WhiteSpace}        {return WHITESPACE;}*/
 
-{CommentError}      {lexeme = yytext();line = yyline; return COMMENT_ERROR;}
-{Errors}            {lexeme = yytext(); line = yyline; return ERROR;}
-.                   {lexeme = yytext(); line = yyline;return ERROR;}
+{Punctuation}       {return new Symbol(sym.Punctuation);}
+{Comparison_op}     {return new Symbol(sym.Comparison_op);}
+{Arithmetic_Op}     {return new Symbol(sym.Arithmetic_op);}
+{Logical_Op}        {return new Symbol(sym.Logical_Op);}
+
+{LeftParenthesis}   {return new Symbol(sym.LeftParenthesis);}
+{RightParenthesis}  {return new Symbol(sym.RightParenthesis);}
+{LeftBrace}         {return new Symbol(sym.LeftBrace);}
+{RightBrace}        {return new Symbol(sym.RightBrace);}
+{LeftBracket}       {return new Symbol(sym.LeftBracket);}
+{RightBracket}      {return new Symbol(sym.RightBracket);}
+
+{CommentError}      { return new Symbol(sym.CommentError);}
+{Errors}            { return new Symbol(sym.Errors);}
+/*.                   {return ERROR;}*/

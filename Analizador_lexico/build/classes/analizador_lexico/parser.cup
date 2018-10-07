@@ -1,0 +1,91 @@
+package analizador_lexico;
+
+import java_cup.runtime.*;
+
+init with {: scanner.init();              :};
+scan with {: return scanner.next_token(); :};
+
+
+terminal            int, double, bool, string, void, class, extends, implements, interface, if, 
+                    else, while, for, return, break, Print, this, New, NewArray, ReadInteger, ReadLine, Malloc, intConstant, 
+                    doubleConstant, boolConstant, stringConstant, null, GetByte, SetByte;
+terminal            Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
+                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point;
+
+terminal String     ident;
+
+non terminal        Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
+                    InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
+                    BreakStmt, PrintStmt, Expr, LValue, Call, LibCall, Actuals, Contant;
+                    
+Program             ::= Decl
+                      | Decl Decl*;
+Decl                ::= VariableDecl
+                      | FunctionDecl
+                      | ClassDecl
+                      | InterfaceDecl
+VaciableDecl        ::= Variable Semicolon;
+Variable            ::= Type ident;
+Type                ::= int
+                      | double
+                      | bool
+                      | string
+                      | ident
+                      | Type LeftBracket RightBracket;
+FunctionDecl        ::= Type ident LeftParenthesis Fotmals RightParenthesis StmtBlock
+                      | void ident LeftParenthesis Fotmals RightParenthesis StmtBlock;
+Formals             ::= Variable
+                      | Variable Comma Variable (Comma Variable)*
+                      | ;
+ClassDecl           ::= class ident (extends ident | )(implements (ident | ident ident*) Comma | ) LeftBracket Field* RightBracket;
+Field               ::= VariableDecl 
+                      | FunctionDecl;
+InterfaceDecl       ::= interface ident LeftBracket Prototype* RightBracket;
+Prototype           ::= Type ident LeftParenthesis Formals RightParenthesis Semicolon
+                    ::= void ident LeftParenthesis Formals RightParenthesis Semicolon;
+Stmt                ::= Expr | Semicolon
+                      | IfStmt
+                      | WhileStmt
+                      | ForStmt
+                      | BreakStmt
+                      | ReturnStmt
+                      | PrintStmt
+                      | StmtBlock
+                      | ;
+IfStmt              ::= if LeftParenthesis Expr RightParenthesis Stmt (else Stmt | );
+WhileStmt           ::= while LeftParenthesis Expr RightParenthesis Stmt;
+ForStmt             ::= for LeftParenthesis (Expr | ) Semicolon Expr Semicolon (Expr | ) RightParenthesis;
+ReturnStmt          ::= return (Expr | ) Semicolon;
+BreakStmt           ::= break Semicolon;
+PrintStmt           ::= Print LeftParenthesis (Expr |Expr Expr*) Comma RightParenthesis Semicolon;
+
+Expr                ::= LValue Equal Expr 
+                      | Constant
+                      | LValue
+                      | this
+                      | Call
+                      | LeftParenthesis Expr RightParenthesis
+                      | Expr Arithmetic_Op Expr
+                      | Expr Comparison_op Expr
+                      | Negation Expr
+                      | New LeftParenthesis ident RightParenthesis
+                      | NewArray LeftParenthesis Expr Comma Type RightParenthesis
+                      | ReadInteger LeftParenthesis RightParenthesis
+                      | ReadLine LeftParenthesis RightParenthesis
+                      | Malloc LeftParenthesis Expr RightParenthesis;
+LValue              ::= ident
+                      | Expr Point ident    
+                      | Expr LeftBrace Expr RightBrace;
+Call                ::= ident LeftParenthesis Actuals RightParenthesis
+                      | Expr Point ident LeftParenthesis Actuals RightParenthesis
+                      | Expr Point LibCall LeftParenthesis Actuals RightParenthesis;
+LibCall             ::= GetByte LeftParenthesis Expr RightParenthesis
+                      | SetByte LeftParenthesis Expr Comma Expr RightParenthesis;
+Actuals             ::= Expr 
+                      | Expr Comma (Expr Comma)*
+                      | ;
+Constant            ::= intConstant
+                      | doubleConstant
+                      | boolConstant
+                      | stringConstant
+                      | null;

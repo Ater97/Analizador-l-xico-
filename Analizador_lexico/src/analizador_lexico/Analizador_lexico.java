@@ -35,7 +35,8 @@ public class Analizador_lexico {
         // TODO code application logic here
         boolean flag = true;
         String path = new File(".").getCanonicalPath();
-        Lex(path + "\\src\\analizador_lexico\\Lexer.flex");
+        GenerateLexerFile(path + "\\src\\analizador_lexico\\Lexer.flex");      
+        GenerateCupFile(path + "\\src\\analizador_lexico\\parser.cup");
         while(flag){
             Analyzer();
             flag = stay();
@@ -45,6 +46,7 @@ public class Analizador_lexico {
     public static boolean flag_ERROR = false;
     public static int ERRORSNumber = 0;
     public static boolean comment_ERROR_Flag = true;
+    
     public static void Analyzer() throws FileNotFoundException, IOException
     {
         flag_ERROR = false;
@@ -54,13 +56,14 @@ public class Analizador_lexico {
         ArrayList<String> result = new ArrayList<String>();
 
         int lineNumber = 1;
-        int tempLineNumber =1;
+        int tempLineNumber = 1;
         String tempLinestr = "";
-        int lenghtA = 1 ;
+        int lenghtA = 1;
         int lenghtB = 0;
         ERRORSNumber = 0;
-        while(true){
+        /*while(true){
             Token token = lexer.yylex();
+           
             if(token==null){
                     createOUT(originalFile.getName(),originalFile.getPath(),result);
                 return;
@@ -165,7 +168,7 @@ public class Analizador_lexico {
                     if(comment_ERROR_Flag){
                         result.add(" " + token + "                         => " + lexer.lexeme + " in line " + lineNumber + " Cols " + lenghtA + "-" + lenghtB);
                         System.out.println(" " + token + " <" + lexer.lexeme+"> in line "+ lineNumber + " Cols " + lenghtA + "-" + lenghtB);}
-                break;*/
+                break;*//*
                 case CONSTANTCOMPARISON_OPERATOR:
                     if(lineNumber == tempLineNumber)
                     {
@@ -297,20 +300,33 @@ public class Analizador_lexico {
                         result.add(lexer.lexeme);//"Token " + token + " "+ lexer.lexeme);
                 break;
             }
-        }
+        }*/
     }
-
-    public static void Lex(String path)
+    public static void GenerateLexerFile(String path)
     {
+        try{
         File file = new File(path);
         jflex.Main.generate(file);
+        }
+                catch(Exception e){
+        }
+    }
+    
+    public static void GenerateCupFile(String path){
+        String[] commands = {"-parser", "SyntacticRules", path};
+        try {
+            {
+                java_cup.Main.main(commands);
+            }
+        } catch (Exception e) {
+        }
     }
     
     public static File OpenFile()
     {
         File fileParse = null;
         JFrame parentFrame = new JFrame();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("C# Files", "frag");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("mini C# Files", "frag");
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Specify a file");  
         fileChooser.setFileFilter(filter);
