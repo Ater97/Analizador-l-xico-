@@ -3,11 +3,12 @@ package analizador_lexico;
 import java_cup.runtime.Symbol;
 
 %%
-/*%class Lexer*/
+%class Lexer
 %line
 %column
 %cup
 %cupdebug 
+
 
 /*Reserved words*/
 reserved_words  = void|Void|int|double|bool|string|class|interface|null|this|extends|implements|for|while|if|else|return|break|New|NewArray|Print|ReadInteger|ReadLine|Malloc 
@@ -42,8 +43,8 @@ Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
 var_id          = "$"{Basic}
                
 Point           = \.                                       
-Semicolon       = ;
-Comma           = ,
+Semicolon       = ";"
+Comma           = ","
 RightParenthesis= \)
 LeftParenthesis = \(
 Parenthesis     = {LeftParenthesis}|{RightParenthesis}
@@ -83,9 +84,15 @@ CommentError    = (\/\*)(.)
 Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 %{
-    public String lexeme;
-    public int line;
+    private Symbol symbol(int type) {
+        return new Symbol(type, yyline, yycolumn);
+    }
+    private Symbol symbol(int type, Object value) {
+        return new Symbol(type, yyline, yycolumn, value);
+    }
 %}
+
+%state STRING
 
 %%
 
@@ -100,7 +107,6 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 {NewLines}          {return new Symbol(sym.NewLines);}
 {Newline}           {return new Symbol(sym.NewLine);}
-/*{WhiteSpace}        {return WHITESPACE;}*/
 
 {Punctuation}       {return new Symbol(sym.Punctuation);}
 {Comparison_op}     {return new Symbol(sym.Comparison_op);}
@@ -113,6 +119,8 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 {RightBrace}        {return new Symbol(sym.RightBrace);}
 {LeftBracket}       {return new Symbol(sym.LeftBracket);}
 {RightBracket}      {return new Symbol(sym.RightBracket);}
+{Negation}          {return new Symbol(sym.Negation);}
+{Equal}             {return new Symbol(sym.Equal);}
 
 {CommentError}      { return new Symbol(sym.CommentError);}
 {Errors}            { return new Symbol(sym.Errors);}

@@ -36,7 +36,7 @@ public class Analizador_lexico {
         boolean flag = true;
         String path = new File(".").getCanonicalPath();
         GenerateLexerFile(path + "\\src\\analizador_lexico\\Lexer.flex");      
-        GenerateCupFile(path + "\\src\\analizador_lexico\\parser.cup");
+        GenerateCupFile(path + "\\src\\analizador_lexico\\parser.cup",path + "\\src\\analizador_lexico");
         while(flag){
             Analyzer();
             flag = stay();
@@ -313,8 +313,10 @@ public class Analizador_lexico {
         }
     }
     
-    public static void GenerateCupFile(String path){
-        String[] commands = {"-parser", "SyntacticRules", path};
+    public static void GenerateCupFile(String path, String Folderpath){
+                          
+        String[] commands = {/* "-expect", "32" ,*/"-destdir", Folderpath, "-parser", "Parser", path};
+        //String[] commands = {"-parser", "parser", path};
         try {
             {
                 java_cup.Main.main(commands);

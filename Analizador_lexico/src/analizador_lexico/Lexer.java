@@ -10,7 +10,7 @@ import java_cup.runtime.Symbol;
  * <a href="http://www.jflex.de/">JFlex</a> 1.6.1
  * from the specification file <tt>D:/GitHub/Analizador-lexico/Analizador_lexico/src/analizador_lexico/Lexer.flex</tt>
  */
-class Yylex implements java_cup.runtime.Scanner {
+class Lexer implements java_cup.runtime.Scanner {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
@@ -20,6 +20,7 @@ class Yylex implements java_cup.runtime.Scanner {
 
   /** lexical states */
   public static final int YYINITIAL = 0;
+  public static final int STRING = 2;
 
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
@@ -28,7 +29,7 @@ class Yylex implements java_cup.runtime.Scanner {
    * l is of the form l = 2*k, k a non negative integer
    */
   private static final int ZZ_LEXSTATE[] = { 
-     0, 0
+     0,  0,  0, 0
   };
 
   /** 
@@ -421,8 +422,12 @@ class Yylex implements java_cup.runtime.Scanner {
   private int zzFinalHighSurrogate = 0;
 
   /* user code: */
-    public String lexeme;
-    public int line;
+    private Symbol symbol(int type) {
+        return new Symbol(type, yyline, yycolumn);
+    }
+    private Symbol symbol(int type, Object value) {
+        return new Symbol(type, yyline, yycolumn, value);
+    }
 
 
   /**
@@ -430,7 +435,7 @@ class Yylex implements java_cup.runtime.Scanner {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  Yylex(java.io.Reader in) {
+  Lexer(java.io.Reader in) {
     this.zzReader = in;
   }
 
@@ -912,7 +917,7 @@ class Yylex implements java_cup.runtime.Scanner {
    */
   public static void main(String argv[]) {
     if (argv.length == 0) {
-      System.out.println("Usage : java Yylex [ --encoding <name> ] <inputfile(s)>");
+      System.out.println("Usage : java Lexer [ --encoding <name> ] <inputfile(s)>");
     }
     else {
       int firstFilePos = 0;
@@ -928,11 +933,11 @@ class Yylex implements java_cup.runtime.Scanner {
         }
       }
       for (int i = firstFilePos; i < argv.length; i++) {
-        Yylex scanner = null;
+        Lexer scanner = null;
         try {
           java.io.FileInputStream stream = new java.io.FileInputStream(argv[i]);
           java.io.Reader reader = new java.io.InputStreamReader(stream, encodingName);
-          scanner = new Yylex(reader);
+          scanner = new Lexer(reader);
           while ( !scanner.zzAtEOF ) scanner.debug_next_token();
         }
         catch (java.io.FileNotFoundException e) {
