@@ -62,6 +62,8 @@ public class Analizador_lexico {
         int lenghtA = 1;
         int lenghtB = 0;
         ERRORSNumber = 0;
+        //Parser P = new Parser();
+        
         /*while(true){
             Token token = lexer.yylex();
            
