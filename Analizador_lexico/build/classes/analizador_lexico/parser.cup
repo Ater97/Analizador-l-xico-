@@ -2,25 +2,26 @@ package analizador_lexico;
 
 import java_cup.runtime.*;
 import java.util.*;
+//parser code {:
+//    scanner s;
+//    Parser(scanner s){ this.s=s; }
+//:}
 
-parser code {:
-    scanner s;
-    Parser(scanner s){ this.s=s; }
-:}
-
-init with {: scanner.init();              :};
-scan with {: return scanner.next_token(); :};
-
+//init with {: scanner.init();              :};
+//scan with {: return scanner.next_token(); :};
 
 
-terminal            int, double, bool, string, void, class, EXTENDS, implements, interface, if, 
-                    else, while, for, return, break, Print, this, New, NewArray, ReadInteger, ReadLine, Malloc, intConstant, 
-                    doubleConstant, boolConstant, stringConstant, null, GetByte, SetByte;
+
+terminal            INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
+                    ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
+                    READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
 
 terminal            Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
                     Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point;
 
-terminal String     ident;
+terminal String     ident, STRINGCONSTANT;
+terminal Integer    INTCONSTANT;
+terminal Double     DOUBLECONSTANT;
 
 non terminal        Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
                     InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
@@ -31,12 +32,13 @@ non terminal        ProgramA, FormalsA, ClassDeclC, ClassDeclBb, ClassDeclB, Cla
 
 
    
-precedence left     int, double, bool, string, void, class, EXTENDS, implements, interface, if, 
-                    else, while, for, return, break, Print, this, New, NewArray, ReadInteger, ReadLine, Malloc, intConstant, 
-                    doubleConstant, boolConstant, stringConstant, null, GetByte, SetByte;
+precedence left     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
+                    ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
+                    READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
 
 precedence left     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, ident;
+                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, 
+                    STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident;
 
                     
 Program             ::= Decl ProgramA;
@@ -49,34 +51,34 @@ Decl                ::= VariableDecl
                       | InterfaceDecl;
 VariableDecl        ::= Variable Semicolon;
 Variable            ::= Type ident;
-Type                ::= int
-                      | double
-                      | bool
-                      | string
+Type                ::= INT
+                      | DOUBLE
+                      | BOOL
+                      | STRING
                       | ident
                       | Type LeftBracket RightBracket;
 FunctionDecl        ::= Type ident LeftParenthesis Formals RightParenthesis StmtBlock
-                      | void ident LeftParenthesis Formals RightParenthesis StmtBlock;
+                      | VOID ident LeftParenthesis Formals RightParenthesis StmtBlock;
 
 Formals             ::= Variable FormalsA
                       |;
 FormalsA            ::= Comma Variable FormalsA
                       |;
 
-ClassDecl           ::= class ident ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket;
+ClassDecl           ::= CLASS ident ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket;
 ClassDeclA          ::= EXTENDS ident |;
-ClassDeclB          ::= implements ident ClassDeclBb |;
+ClassDeclB          ::= IMPLEMENTS ident ClassDeclBb |;
 ClassDeclBb         ::= Comma ident ClassDeclBb |;
 ClassDeclC          ::= Field ClassDeclC |;
 
 Field               ::= VariableDecl 
                       | FunctionDecl;
 
-InterfaceDecl       ::= interface ident LeftBracket InterfaceDeclA RightBracket;
+InterfaceDecl       ::= INTERFACE ident LeftBracket InterfaceDeclA RightBracket;
 InterfaceDeclA      ::= Prototype InterfaceDeclA |;
 
 Prototype           ::= Type ident LeftParenthesis Formals RightParenthesis Semicolon
-                      | void ident LeftParenthesis Formals RightParenthesis Semicolon;
+                      | VOID ident LeftParenthesis Formals RightParenthesis Semicolon;
 
 StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket;
 StmtBlockA          ::= StmtBlockA VariableDecl |;
@@ -92,35 +94,35 @@ Stmt                ::= Expr Semicolon
                       | PrintStmt
                       | StmtBlock
                       |;
-IfStmt              ::= if LeftParenthesis Expr RightParenthesis Stmt IfStmtA;
-IfStmtA             ::= else Stmt |;
+IfStmt              ::= IF LeftParenthesis Expr RightParenthesis Stmt IfStmtA;
+IfStmtA             ::= ELSE Stmt |;
 
-WhileStmt           ::= while LeftParenthesis Expr RightParenthesis Stmt;
+WhileStmt           ::= WHILE LeftParenthesis Expr RightParenthesis Stmt;
 
-ForStmt             ::= for LeftParenthesis ForStmtA Semicolon Expr Semicolon ForStmtA RightParenthesis;
+ForStmt             ::= FOR LeftParenthesis ForStmtA Semicolon Expr Semicolon ForStmtA RightParenthesis;
 ForStmtA            ::= Expr |;
-ReturnStmt          ::= return ForStmtA Semicolon;
+ReturnStmt          ::= RETURN ForStmtA Semicolon;
 
-BreakStmt           ::= break Semicolon;
+BreakStmt           ::= BREAK Semicolon;
 
-PrintStmt           ::= Print LeftParenthesis PrintStmtA RightParenthesis Semicolon;
+PrintStmt           ::= PRINT LeftParenthesis PrintStmtA RightParenthesis Semicolon;
 PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa |;
 
 Expr                ::= LValue Equal Expr 
                       | Constant
                       | LValue
-                      | this
+                      | THIS
                       | Call
                       | LeftParenthesis Expr RightParenthesis
                       | Expr Arithmetic_Op Expr
                       | Expr Comparison_op Expr
                       | Negation Expr
-                      | New LeftParenthesis ident RightParenthesis
-                      | NewArray LeftParenthesis Expr Comma Type RightParenthesis
-                      | ReadInteger LeftParenthesis RightParenthesis
-                      | ReadLine LeftParenthesis RightParenthesis
-                      | Malloc LeftParenthesis Expr RightParenthesis;
+                      | NEW LeftParenthesis ident RightParenthesis
+                      | NEWARRAY LeftParenthesis Expr Comma Type RightParenthesis
+                      | READINTEGER LeftParenthesis RightParenthesis
+                      | READLINE LeftParenthesis RightParenthesis
+                      | MALLOC LeftParenthesis Expr RightParenthesis;
 
 LValue              ::= ident
                       | Expr Point ident    
@@ -130,15 +132,15 @@ Call                ::= ident LeftParenthesis Actuals RightParenthesis
                       | Expr Point ident LeftParenthesis Actuals RightParenthesis
                       | Expr Point LibCall LeftParenthesis Actuals RightParenthesis;
 
-LibCall             ::= GetByte LeftParenthesis Expr RightParenthesis
-                      | SetByte LeftParenthesis Expr Comma Expr RightParenthesis;
+LibCall             ::= GETBYTE LeftParenthesis Expr RightParenthesis
+                      | SETBYTE LeftParenthesis Expr Comma Expr RightParenthesis;
 
 Actuals             ::= Expr ActualsA
                       |;
 ActualsA            ::= Comma ActualsA |;
 
-Constant            ::= intConstant
-                      | doubleConstant
-                      | boolConstant
-                      | stringConstant
-                      | null;
+Constant            ::= INTCONSTANT
+                      | DOUBLECONSTANT
+                      | BOOLCONSTANT
+                      | STRINGCONSTANT
+                      | NULL;
