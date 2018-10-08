@@ -2,14 +2,17 @@ package analizador_lexico;
 
 import java_cup.runtime.*;
 import java.util.*;
+import adtl.Lexer.*;
+import adtl.ast.*;
 
 init with {: scanner.init();              :};
 scan with {: return scanner.next_token(); :};
 
 
-terminal            int, double, bool, string, void, class, extends, implements, interface, if, 
+terminal            int, double, bool, string, void, class, EXTENDS, implements, interface, if, 
                     else, while, for, return, break, Print, this, New, NewArray, ReadInteger, ReadLine, Malloc, intConstant, 
                     doubleConstant, boolConstant, stringConstant, null, GetByte, SetByte;
+
 terminal            Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
                     Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point;
 
@@ -17,15 +20,27 @@ terminal String     ident;
 
 non terminal        Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
                     InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
-                    BreakStmt, PrintStmt, Expr, LValue, Call, LibCall, Actuals, Contant;
+                    BreakStmt, PrintStmt, Expr, LValue, Call, LibCall, Actuals, Constant;
+
+non terminal        ProgramA, FormalsA, ClassDeclC, ClassDeclBb, ClassDeclB, ClassDeclA, InterfaceDeclA, IfStmtA,
+                    PrintStmtA, PrintStmtAa, StmtA, ForStmtA, PrintStmAa, ActualsA, StmtBlockA, StmtBlockB;
+
+precedence left     int, double, bool, string, void, class, EXTENDS, implements, interface, if, 
+                    else, while, for, return, break, Print, this, New, NewArray, ReadInteger, ReadLine, Malloc, intConstant, 
+                    doubleConstant, boolConstant, stringConstant, null, GetByte, SetByte;
+
+precedence left     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
+                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point;
                     
-Program             ::= Decl
-                      | Decl Decl*;
+Program             ::= Decl ProgramA;
+ProgramA             ::= Decl ProgramA
+                      | ;
+
 Decl                ::= VariableDecl
                       | FunctionDecl
                       | ClassDecl
                       | InterfaceDecl;
-VaciableDecl        ::= Variable Semicolon;
+VariableDecl        ::= Variable Semicolon;
 Variable            ::= Type ident;
 Type                ::= int
                       | double
@@ -33,18 +48,34 @@ Type                ::= int
                       | string
                       | ident
                       | Type LeftBracket RightBracket;
-FunctionDecl        ::= Type ident LeftParenthesis Fotmals RightParenthesis StmtBlock
-                      | void ident LeftParenthesis Fotmals RightParenthesis StmtBlock;
-Formals             ::= Variable
-                      | Variable Comma Variable (Comma Variable)*
+FunctionDecl        ::= Type ident LeftParenthesis Formals RightParenthesis StmtBlock
+                      | void ident LeftParenthesis Formals RightParenthesis StmtBlock;
+
+Formals             ::= Variable FormalsA
                       | ;
-ClassDecl           ::= class ident (extends ident | )(implements (ident | ident ident*) Comma | ) LeftBracket Field* RightBracket;
+FormalsA            ::= Comma Variable FormalsA
+                      | ;
+
+ClassDecl           ::= class ident ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket;
+ClassDeclA          ::= EXTENDS ident | ;
+ClassDeclB          ::= implements ident ClassDeclBb | ;
+ClassDeclBb         ::= Comma ident ClassDeclBb | ;
+ClassDeclC          ::= Field ClassDeclC | ;
+
 Field               ::= VariableDecl 
                       | FunctionDecl;
-InterfaceDecl       ::= interface ident LeftBracket Prototype* RightBracket;
+
+InterfaceDecl       ::= interface ident LeftBracket InterfaceDeclA RightBracket;
+InterfaceDeclA      ::= Prototype InterfaceDeclA | ;
+
 Prototype           ::= Type ident LeftParenthesis Formals RightParenthesis Semicolon
-                    ::= void ident LeftParenthesis Formals RightParenthesis Semicolon;
-Stmt                ::= Expr | Semicolon
+                      | void ident LeftParenthesis Formals RightParenthesis Semicolon;
+
+StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket;
+StmtBlockA          ::= VariableDecl StmtBlockA | ;
+StmtBlockB          ::= Stmt StmtBlockB | ;
+
+Stmt                ::= StmtA Semicolon
                       | IfStmt
                       | WhileStmt
                       | ForStmt
@@ -53,12 +84,23 @@ Stmt                ::= Expr | Semicolon
                       | PrintStmt
                       | StmtBlock
                       | ;
-IfStmt              ::= if LeftParenthesis Expr RightParenthesis Stmt (else Stmt | );
+StmtA               ::= Expr | ;
+
+IfStmt              ::= if LeftParenthesis Expr RightParenthesis Stmt IfStmtA;
+IfStmtA             ::= else Stmt | ;
+
 WhileStmt           ::= while LeftParenthesis Expr RightParenthesis Stmt;
-ForStmt             ::= for LeftParenthesis (Expr | ) Semicolon Expr Semicolon (Expr | ) RightParenthesis;
-ReturnStmt          ::= return (Expr | ) Semicolon;
+
+ForStmt             ::= for LeftParenthesis ForStmtA Semicolon Expr Semicolon ForStmtA RightParenthesis;
+ForStmtA            ::= Expr | ;
+ReturnStmt          ::= return ForStmtA Semicolon;
+
+
 BreakStmt           ::= break Semicolon;
-PrintStmt           ::= Print LeftParenthesis (Expr |Expr Expr*) Comma RightParenthesis Semicolon;
+
+PrintStmt           ::= Print LeftParenthesis PrintStmtA RightParenthesis Semicolon;
+PrintStmtA          ::= Expr PrintStmtAa;
+PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
 Expr                ::= LValue Equal Expr 
                       | Constant
@@ -74,17 +116,23 @@ Expr                ::= LValue Equal Expr
                       | ReadInteger LeftParenthesis RightParenthesis
                       | ReadLine LeftParenthesis RightParenthesis
                       | Malloc LeftParenthesis Expr RightParenthesis;
+
+LValueCall          ::= Expr Point;
 LValue              ::= ident
                       | Expr Point ident    
                       | Expr LeftBrace Expr RightBrace;
+
 Call                ::= ident LeftParenthesis Actuals RightParenthesis
                       | Expr Point ident LeftParenthesis Actuals RightParenthesis
                       | Expr Point LibCall LeftParenthesis Actuals RightParenthesis;
+
 LibCall             ::= GetByte LeftParenthesis Expr RightParenthesis
                       | SetByte LeftParenthesis Expr Comma Expr RightParenthesis;
-Actuals             ::= Expr 
-                      | Expr Comma (Expr Comma)*
+
+Actuals             ::= Expr ActualsA
                       | ;
+ActualsA            ::= Comma ActualsA | ;
+
 Constant            ::= intConstant
                       | doubleConstant
                       | boolConstant
