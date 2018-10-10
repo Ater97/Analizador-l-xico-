@@ -122,7 +122,7 @@ Expr                ::= LValue Equal Expr
                       | LValue
                       | THIS
                       | Call
-                      | LeftParenthesis Expr RightParenthesis
+                      | LeftParenthesis Expr RightParenthesis 
                       | Expr Arithmetic_Op Expr
                       | Expr Comparison_op Expr
                       | Expr Logical_Op Expr

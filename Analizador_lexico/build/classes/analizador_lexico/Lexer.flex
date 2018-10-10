@@ -155,12 +155,15 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 "."                 {return new Symbol(sym.Point, yyline, yycolumn, yytext());}
 
 {ident}             {lexeme=yytext();
-                    if(lexeme.length()<31)
-                        return new Symbol(sym.ident, yyline, yycolumn, yytext());
-                    linenumber=yyline;
-                    columnnumber=yycolumn;
-                    String temp = lexeme.substring(0, 30);
-                    getIdenterror(temp);
+                        
+                    if(lexeme.length()<=31)
+                    {
+                        linenumber=yyline;
+                        columnnumber=yycolumn;
+                        String temp = lexeme.substring(0, 30);
+                        getIdenterror(temp);
+                    }
+                       return new Symbol(sym.ident, yyline, yycolumn, yytext());
                     } 
 
 {Comment}           {}
