@@ -4,26 +4,31 @@ import java_cup.runtime.*;
 
 parser code  {: 
 
-   public String ErrorM="";
+   public String ErrorM = "";
 
 //   public void syntax_error(Symbol cur_token) {  
 //       ErrorM += " Message Line: " + (cur_token.left+1) + " Col: " +(cur_token.right+1) + " " + cur_token.value+"\n";
 //   }
-    public void syntax_error(Symbol s){
-		report_error("Error de sintaxis. Columna: " + (s.right + 1) +
-		" Linea: " + s.left + ". Texto: \"" + s.value + "\"", null);
-            ErrorM+="Error de sintaxis. Columna: " + (s.right + 1) +
-		" Linea: " + s.left + ". Texto: \"" + s.value + "\""+"\r\n";
-	}
-        public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
-        {
-         //report_fatal_error("Fatal Error: " + s.value, null);
+
+public void report_error(String message, Object info) {
+
+        if (info instanceof java_cup.runtime.Symbol) {
+          java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+          
+          if(s.left >= 0){
+             ErrorM += " line number " + (s.left + 1) + " ";
+             
+             if(s.right >=0)
+                ErrorM += "  column " + (s.right +1) + " Text: " + s.value;
+          }
         }
-        
-  // public void report_fatal_error(String message, Object info) {
-  //     report_error(message, info);
-  //     syntax_error(cur_token);
-  //}
+        ErrorM += " message: " + message + "\n";
+    }
+    
+    public void report_fatal_error(String message, Object info){
+        report_error(message, info);
+        }
+       
 :};
 
 terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
@@ -152,7 +157,7 @@ LibCall             ::= GETBYTE LeftParenthesis Expr RightParenthesis
 
 Actuals             ::= Expr ActualsA
                       |;
-ActualsA            ::= Comma ActualsA |;
+ActualsA            ::= Comma Expr ActualsA |;
 
 Constant            ::= INTCONSTANT
                       | DOUBLECONSTANT
