@@ -12,18 +12,34 @@ import java_cup.runtime.*;
 
 
 %{
+    public int linenumber = 0;
+    public int columnnumber = 0;
+    public String lexeme;
+    public int errornumber = 0;
+    public int errornumberLength = 0;
+    public String Errors = "";
+    public void getErrors(String error){
+        errornumber++;
+       System.out.println( errornumber + " Lexic Message Line: " + linenumber + " Col: " + columnnumber + " Text: " + error);
+    }
+    public void getIdenterror(String error){
+        errornumberLength++;
+       System.out.println( errornumberLength + " Lenght Message Line: " + linenumber + " Col: " + columnnumber + " Text: " + error);
+    }
     private Symbol symbol(int type) {
         return new Symbol(type, yyline, yycolumn, yytext());
     }
     private Symbol symbol(int type, Object value) {
         return new Symbol(type, yyline, yycolumn, value);
     }
+
+
 %}
 
 /*Operators*/
 /*  (, ), +, -, *, /, %, <, <=, >, >=, ==, !=, &&, ||, !  */
 
-Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"||" 
+Comparison_op   = "<"|">"|"<="|">="|"=="|"!="
  
 /*  |"==="|"<>"|"<=>"|"??"   */
 /*Arithmetic*/
@@ -31,7 +47,7 @@ Equal           = "="
 Negation        = "!"|"-"
 Arithmetic_Op   = \+|\-|\*|\/|\%
 /*Logic*/
-/*Logical_Op      = ["and"|"or"|"xor"|"!"|"&&"|\|\|]+*/
+Logical_Op      = "||"|"!"|"&&"
 
 /*Types*/
 Booleans        =true|false
@@ -42,7 +58,7 @@ Binary          = 0[bB][01]+
 Integers        = [+-]?{Decimal}|[+-]?{Hexadecimal}|[+-]?{Octal}|[+-]?{Binary}
 Double          = [+-]?([1-9][0-9]*|0)(\.)[0-9]*|{Exponent_Dnum}|[+-]?(({Lnum}|{Dnum})\.[eE][+-]? {Lnum})
 
-Point           = \.                                       
+Point           = "."                                       
 Semicolon       = ";"
 Comma           = ","
 RightParenthesis= ")"
@@ -73,8 +89,6 @@ Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|[0-9]*"pt"|(\/\*)(.)*(\*\/)|"/*"([
 Newline         = \n
 NewLines        ={Newline}+|{Newline}({Newline}|{WhiteSpace}|" ")* 
 WhiteSpace      = [\s\t\r\v\f]
-
-/*Point           = \.|\?|:|\\*/
 
 Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|"[]"|"{}"
 /*Constant        ={Booleans}|{Integers}|{Double}|{String}*/
@@ -129,6 +143,7 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 {Comparison_op}     {return new Symbol(sym.Comparison_op, yyline, yycolumn, yytext());}
 {Arithmetic_Op}     {return new Symbol(sym.Arithmetic_Op, yyline, yycolumn, yytext());}
+{Logical_Op}        {return new Symbol(sym.Logical_Op, yyline, yycolumn, yytext());}
 {Equal}             {return new Symbol(sym.Equal, yyline, yycolumn, yytext());}
 {LeftBrace}         {return new Symbol(sym.LeftBrace, yyline, yycolumn, yytext());}
 {RightBrace}        {return new Symbol(sym.RightBrace, yyline, yycolumn, yytext());}
@@ -137,9 +152,16 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 {Negation}          {return new Symbol(sym.Negation, yyline, yycolumn, yytext());}
 {Semicolon}         {return new Symbol(sym.Semicolon, yyline, yycolumn, yytext());}
 {Comma}             {return new Symbol(sym.Comma, yyline, yycolumn, yytext());}
-{Point}             {return new Symbol(sym.Point, yyline, yycolumn, yytext());}
+"."                 {return new Symbol(sym.Point, yyline, yycolumn, yytext());}
 
-{ident}             {return new Symbol(sym.ident, yyline, yycolumn, yytext());} 
+{ident}             {lexeme=yytext();
+                    if(lexeme.length()<31)
+                        return new Symbol(sym.ident, yyline, yycolumn, yytext());
+                    linenumber=yyline;
+                    columnnumber=yycolumn;
+                    String temp = lexeme.substring(0, 30);
+                    getIdenterror(temp);
+                    } 
 
 {Comment}           {}
 
@@ -149,7 +171,8 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 {Punctuation}       {}
 {NewLines}          {}
 {CommentError}      {}
-{Errors}            { /*return new Symbol(sym.Errors);*/}
-
+{Errors}            {}
+" "                 {}
+{WhiteSpace}        {}
 }
-.                   {}
+.                   {lexeme=yytext();linenumber=yyline;columnnumber=yycolumn;getErrors(lexeme);}

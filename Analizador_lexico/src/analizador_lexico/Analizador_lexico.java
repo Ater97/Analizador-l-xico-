@@ -54,16 +54,26 @@ public class Analizador_lexico {
         Lexer lexer = new Lexer(new FileReader(originalFile.getPath()));
         ArrayList<String> result = new ArrayList<String>();
 
-        ERRORSNumber = 0;
+        /*int lineNumber = 1;
+        int tempLineNumber = 1;
+        String tempLinestr = "";
+        int lenghtA = 1;
+        int lenghtB = 0;
+        ERRORSNumber = 0;*/
         Parser P = new Parser(lexer);
-        P.debug_parse();
-        //P.parse();
-        //result.add(P.ErrorM);
-        System.out.println(P.ErrorM);
-        
+       // P.debug_parse();
+        P.parse();
+        result.add(P.ErrorM);        
+        if(P.ErrorNumber == 0 && lexer.errornumber == 0 && lexer.errornumberLength == 0)
+            System.out.println("Correct file :)");
+        else{
+        System.out.println(P.ErrorM + "\nSintac: " + P.ErrorNumber + 
+                        "\nLexic: " + lexer.errornumber + 
+                        "\nLength: " + lexer.errornumberLength + 
+                        "\nTotal: " + (P.ErrorNumber + lexer.errornumber + lexer.errornumberLength));
+        }
         
         //createOUT(originalFile.getName(),originalFile.getPath(),result);
-        
         
         /*while(true){
             Token token = lexer.yylex();
