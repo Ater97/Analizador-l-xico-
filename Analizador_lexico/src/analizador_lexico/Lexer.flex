@@ -1,17 +1,24 @@
+
 package analizador_lexico;
 
-import java_cup.runtime.Symbol;
+import java_cup.runtime.*;
 
 %%
 %class Lexer
+%unicode
 %line
 %column
 %cup
-%cupdebug 
 
 
-/*Reserved words*/
-/*reserved_words  = void|Void|int|double|bool|string|class|interface|null|this|extends|implements|for|while|if|else|return|break|New|NewArray|Print|ReadInteger|ReadLine|Malloc */
+%{
+    private Symbol symbol(int type) {
+        return new Symbol(type, yyline, yycolumn, yytext());
+    }
+    private Symbol symbol(int type, Object value) {
+        return new Symbol(type, yyline, yycolumn, value);
+    }
+%}
 
 /*Operators*/
 /*  (, ), +, -, *, /, %, <, <=, >, >=, ==, !=, &&, ||, !  */
@@ -22,7 +29,7 @@ Comparison_op   = "<"|">"|"<="|">="|"=="|"!="|"||"
 /*Arithmetic*/
 Equal           = "="
 Negation        = "!"|"-"
-Arithmetic_Op   = \+|\-|\*|\/|\%|"="
+Arithmetic_Op   = \+|\-|\*|\/|\%
 /*Logic*/
 /*Logical_Op      = ["and"|"or"|"xor"|"!"|"&&"|\|\|]+*/
 
@@ -35,18 +42,11 @@ Binary          = 0[bB][01]+
 Integers        = [+-]?{Decimal}|[+-]?{Hexadecimal}|[+-]?{Octal}|[+-]?{Binary}
 Double          = [+-]?([1-9][0-9]*|0)(\.)[0-9]*|{Exponent_Dnum}|[+-]?(({Lnum}|{Dnum})\.[eE][+-]? {Lnum})
 
-/*String          = ('([^(')(\n)(\\')])*')|(\"([^(\")(\n)(\\\")])*\")*/
-/*String          =('(.)*')|(\"(.)*\")*/    
-
-/*Vars*/
-/*Basic           = [a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*
-var_id          = "$"{Basic}*/
-               
 Point           = \.                                       
 Semicolon       = ";"
 Comma           = ","
-RightParenthesis= \)
-LeftParenthesis = \(
+RightParenthesis= ")"
+LeftParenthesis = "("
 Parenthesis     = {LeftParenthesis}|{RightParenthesis}
 RightBrace      = \]
 LeftBrace       = \[
@@ -54,7 +54,7 @@ Brace           = {LeftBrace}|{RightBrace}
 RightBracket    = \}
 LeftBracket     = \{
 Bracket         = {LeftBracket}|{RightBracket}
-String          =('(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|{Point})*')|(\"(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket})*\")
+String          =(\'(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|{Point})*\')|(\"(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket})*\")
 
 
 /*Functions*/
@@ -71,12 +71,12 @@ ident           = ((_)*)?[a-zA-Z][a-zA-Z0-9_]*
 Comment         =((\/\/)(.)*)|("\/\*"~"\*\/")|[0-9]*"pt"|(\/\*)(.)*(\*\/)|"/*"([^\*]|\*[^/])"*/"|"/*"(.)"*/"
 
 Newline         = \n
-NewLines        ={Newline}+|{Newline}({Newline}|{WhiteSpace}|" ")*
+NewLines        ={Newline}+|{Newline}({Newline}|{WhiteSpace}|" ")* 
 WhiteSpace      = [\s\t\r\v\f]
 
 Point           = \.|\?|:|\\
 
-Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|"[]"|"{}"|"()"
+Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|"[]"|"{}"
 /*Constant        ={Booleans}|{Integers}|{Double}|{String}*/
 /*("$"?[0-9]*[a-zA-Z0-9]*)|("=!=")*/
 
@@ -86,27 +86,23 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 
 
-%{
-    private Symbol symbol(int type) {
-        return new Symbol(type, yyline, yycolumn);
-    }
-    private Symbol symbol(int type, Object value) {
-        return new Symbol(type, yyline, yycolumn, value);
-    }
-%}
 
-%state STRING
+
+/*%state STRING*/
 
 %%
+<YYINITIAL>{
 
+{LeftParenthesis}   {return new Symbol(sym.LeftParenthesis);}
+{RightParenthesis}  {return new Symbol(sym.RightParenthesis);}
 
-"int"                {return new Symbol(sym.INT);} 
+"int"               {return new Symbol(sym.INT);} 
 "double"            {return new Symbol(sym.DOUBLE);} 
 "bool"              {return new Symbol(sym.BOOL);} 
 "string"            {return new Symbol(sym.STRING);} 
 "void"              {return new Symbol(sym.VOID);} 
 "class"             {return new Symbol(sym.CLASS);} 
-"EXTENDS"           {return new Symbol(sym.EXTENDS);} 
+"extends"           {return new Symbol(sym.EXTENDS);} 
 "implements"        {return new Symbol(sym.IMPLEMENTS);} 
 "interface"         {return new Symbol(sym.INTERFACE);}
 "if"                {return new Symbol(sym.IF);} 
@@ -122,10 +118,10 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 "ReadInteger"       {return new Symbol(sym.READINTEGER);} 
 "ReadLine"          {return new Symbol(sym.READLINE);} 
 "Malloc"            {return new Symbol(sym.MALLOC);} 
-{Integers}          {return new Symbol(sym.INTCONSTANT);} 
-{Double}            {return new Symbol(sym.DOUBLECONSTANT);} 
-{Booleans}          {return new Symbol(sym.BOOLCONSTANT);} 
-{String}            {return new Symbol(sym.STRINGCONSTANT);} 
+{Integers}          {return new Symbol(sym.INTCONSTANT, yytext());} 
+{Double}            {return new Symbol(sym.DOUBLECONSTANT, yytext());} 
+{Booleans}          {return new Symbol(sym.BOOLCONSTANT, yytext());} 
+{String}            {return new Symbol(sym.STRINGCONSTANT, yytext());} 
 "null"              {return new Symbol(sym.NULL);} 
 "GetByte"           {return new Symbol(sym.GETBYTE);} 
 "SetByte"           {return new Symbol(sym.SETBYTE);} 
@@ -133,29 +129,27 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 {Comparison_op}     {return new Symbol(sym.Comparison_op);}
 {Arithmetic_Op}     {return new Symbol(sym.Arithmetic_Op);}
-
-{LeftParenthesis}   {return new Symbol(sym.LeftParenthesis);}
-{RightParenthesis}  {return new Symbol(sym.RightParenthesis);}
+{Equal}             {return new Symbol(sym.Equal);}
 {LeftBrace}         {return new Symbol(sym.LeftBrace);}
 {RightBrace}        {return new Symbol(sym.RightBrace);}
 {LeftBracket}       {return new Symbol(sym.LeftBracket);}
 {RightBracket}      {return new Symbol(sym.RightBracket);}
 {Negation}          {return new Symbol(sym.Negation);}
-{Equal}             {return new Symbol(sym.Equal);}
 {Semicolon}         {return new Symbol(sym.Semicolon);}
 {Comma}             {return new Symbol(sym.Comma);}
 {Point}             {return new Symbol(sym.Point);}
 
-/*{reserved_words}    {return new Symbol(sym.reserved_words);} */
 {ident}             {return new Symbol(sym.ident);} 
 
 {Comment}           {/*return new Symbol(sym.Comment);*/}
 
-{NewLines}          {/*return new Symbol(sym.NewLines);*/}
-/*{Newline}           {return new Symbol(sym.NewLine);}*/
+[\t\r]              {}
+[\r\n]+             {}
 
-/*{Logical_Op}        {/*return new Symbol(sym.Logical_Op);*/}*/
 {Punctuation}       {}
+{NewLines}          {}
 {CommentError}      { /*return new Symbol(sym.CommentError);*/}
 {Errors}            { /*return new Symbol(sym.Errors);*/}
-/*.                   {return ERROR;}*/
+
+}
+.                   {}

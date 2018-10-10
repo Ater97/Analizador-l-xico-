@@ -31,7 +31,7 @@ public class Analizador_lexico {
      * @throws java.io.IOException
      */
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, Exception {
         // TODO code application logic here
         boolean flag = true;
         String path = new File(".").getCanonicalPath();
@@ -47,26 +47,27 @@ public class Analizador_lexico {
     public static int ERRORSNumber = 0;
     public static boolean comment_ERROR_Flag = true;
     
-    public static void Analyzer() throws FileNotFoundException, IOException
+    public static void Analyzer() throws FileNotFoundException, IOException, Exception
     {
         flag_ERROR = false;
         File originalFile = OpenFile();
-        Reader reader = new BufferedReader(new FileReader(originalFile.getPath()));
-        //Lexer lexer = new Lexer(reader);
-        //Yylex lexer = new Yylex(reader);
+        Lexer lexer = new Lexer(new FileReader(originalFile.getPath()));
         ArrayList<String> result = new ArrayList<String>();
 
-        int lineNumber = 1;
-        int tempLineNumber = 1;
-        String tempLinestr = "";
-        int lenghtA = 1;
-        int lenghtB = 0;
         ERRORSNumber = 0;
-        Parser P = new Parser();
+        Parser P = new Parser(lexer);
+        P.debug_parse();
+        //P.parse();
+        //result.add(P.ErrorM);
+        System.out.println(P.ErrorM);
+        
+        
+        //createOUT(originalFile.getName(),originalFile.getPath(),result);
+        
         
         /*while(true){
             Token token = lexer.yylex();
-           
+           x`
             if(token==null){
                     createOUT(originalFile.getName(),originalFile.getPath(),result);
                 return;
@@ -309,7 +310,7 @@ public class Analizador_lexico {
     {
         try{
         File file = new File(path);
-        jflex.Main.generate(file);
+        JFlex.Main.generate(file);
         }
                 catch(Exception e){
         }

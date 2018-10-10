@@ -1,22 +1,36 @@
 package analizador_lexico;
 
 import java_cup.runtime.*;
-import java.util.*;
-//parser code {:
-//    scanner s;
-//    Parser(scanner s){ this.s=s; }
-//:}
 
-//init with {: scanner.init();              :};
-//scan with {: return scanner.next_token(); :};
+parser code  {: 
 
+   public String ErrorM="";
 
+//   public void syntax_error(Symbol cur_token) {  
+//       ErrorM += " Message Line: " + (cur_token.left+1) + " Col: " +(cur_token.right+1) + " " + cur_token.value+"\n";
+//   }
+    public void syntax_error(Symbol s){
+		report_error("Error de sintaxis. Columna: " + (s.right + 1) +
+		" Linea: " + s.left + ". Texto: \"" + s.value + "\"", null);
+            ErrorM+="Error de sintaxis. Columna: " + (s.right + 1) +
+		" Linea: " + s.left + ". Texto: \"" + s.value + "\""+"\r\n";
+	}
+        public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
+        {
+         //report_fatal_error("Fatal Error: " + s.value, null);
+        }
+        
+  // public void report_fatal_error(String message, Object info) {
+  //     report_error(message, info);
+  //     syntax_error(cur_token);
+  //}
+:};
 
-terminal            INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
+terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
 
-terminal            Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
+terminal Object     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
                     Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point;
 
 terminal String     ident, STRINGCONSTANT;
@@ -36,9 +50,10 @@ precedence left     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
 
-precedence left     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, 
-                    STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident;
+precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
+                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point;
+ 
+precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, Semicolon;
 
                     
 Program             ::= Decl ProgramA;
@@ -49,6 +64,7 @@ Decl                ::= VariableDecl
                       | FunctionDecl
                       | ClassDecl
                       | InterfaceDecl;
+
 VariableDecl        ::= Variable Semicolon;
 Variable            ::= Type ident;
 Type                ::= INT
@@ -81,8 +97,8 @@ Prototype           ::= Type ident LeftParenthesis Formals RightParenthesis Semi
                       | VOID ident LeftParenthesis Formals RightParenthesis Semicolon;
 
 StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket;
-StmtBlockA          ::= StmtBlockA VariableDecl |;
-StmtBlockB          ::= StmtBlockB Stmt |;
+StmtBlockA          ::=  StmtBlockA  VariableDecl|;
+StmtBlockB          ::=  Stmt StmtBlockB|;
 
 Stmt                ::= Expr Semicolon
                       | Semicolon
@@ -92,10 +108,9 @@ Stmt                ::= Expr Semicolon
                       | BreakStmt
                       | ReturnStmt
                       | PrintStmt
-                      | StmtBlock
-                      |;
+                      | StmtBlock;
 IfStmt              ::= IF LeftParenthesis Expr RightParenthesis Stmt IfStmtA;
-IfStmtA             ::= ELSE Stmt |;
+IfStmtA             ::= ELSE Stmt | ;
 
 WhileStmt           ::= WHILE LeftParenthesis Expr RightParenthesis Stmt;
 
