@@ -1,0 +1,156 @@
+package analizador_lexico;
+
+import java_cup.runtime.*;
+
+parser code  {: 
+
+   public String ErrorM = "";
+   public int ErrorNumber = 0;
+
+   public void syntax_error(Symbol cur_token) {  
+        ErrorNumber++;
+        ErrorM += ErrorNumber + " Sintac Message Line: " + (cur_token.left+1) + " Col: " +(cur_token.right+1) + " Text: " + cur_token.value+"\n";
+   }
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
+    {
+    }
+       
+:};
+
+terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
+                    ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
+                    READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
+
+terminal Object     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
+                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+
+terminal String     ident, STRINGCONSTANT;
+terminal Integer    INTCONSTANT;
+terminal Double     DOUBLECONSTANT;
+
+non terminal        Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
+                    InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
+                    BreakStmt, PrintStmt, Expr, LValue, Call, LibCall, Actuals, Constant;
+
+non terminal        ProgramA, FormalsA, ClassDeclC, ClassDeclBb, ClassDeclB, ClassDeclA, InterfaceDeclA, IfStmtA,
+                    PrintStmtA, PrintStmtAa, ForStmtA, ActualsA, StmtBlockA, StmtBlockB;
+
+
+   
+precedence left     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
+                    ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
+                    READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
+precedence left     Negation, Semicolon;
+
+precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
+                    Arithmetic_Op, Equal,Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+ 
+precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident;
+
+                    
+Program             ::= Decl ProgramA;
+ProgramA            ::= Decl ProgramA
+                      |;
+
+Decl                ::= VariableDecl
+                      | FunctionDecl
+                      | ClassDecl
+                      | InterfaceDecl
+                      | error Semicolon
+                      | error RightBracket;
+
+VariableDecl        ::= Variable Semicolon;
+Variable            ::= Type ident;
+Type                ::= INT
+                      | DOUBLE
+                      | BOOL
+                      | STRING
+                      | ident
+                      | Type LeftBracket RightBracket;
+FunctionDecl        ::= Type ident LeftParenthesis Formals RightParenthesis StmtBlock
+                      | VOID ident LeftParenthesis Formals RightParenthesis StmtBlock;
+
+Formals             ::= Variable FormalsA
+                      |;
+FormalsA            ::= Comma Variable FormalsA
+                      |;
+
+ClassDecl           ::= CLASS ident ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket;
+ClassDeclA          ::= EXTENDS ident |;
+ClassDeclB          ::= IMPLEMENTS ident ClassDeclBb |;
+ClassDeclBb         ::= Comma ident ClassDeclBb |;
+ClassDeclC          ::= Field ClassDeclC |;
+
+Field               ::= VariableDecl 
+                      | FunctionDecl;
+
+InterfaceDecl       ::= INTERFACE ident LeftBracket InterfaceDeclA RightBracket;
+InterfaceDeclA      ::= Prototype InterfaceDeclA |;
+
+Prototype           ::= Type ident LeftParenthesis Formals RightParenthesis Semicolon
+                      | VOID ident LeftParenthesis Formals RightParenthesis Semicolon;
+
+StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket;
+StmtBlockA          ::= StmtBlockA  VariableDecl|;
+StmtBlockB          ::= Stmt StmtBlockB|;
+
+Stmt                ::= Expr Semicolon
+                      | Semicolon
+                      | IfStmt
+                      | WhileStmt
+                      | ForStmt
+                      | BreakStmt
+                      | ReturnStmt
+                      | PrintStmt
+                      | StmtBlock;
+IfStmt              ::= IF LeftParenthesis Expr RightParenthesis Stmt IfStmtA;
+IfStmtA             ::= ELSE Stmt | ;
+
+WhileStmt           ::= WHILE LeftParenthesis Expr RightParenthesis Stmt;
+
+ForStmt             ::= FOR LeftParenthesis ForStmtA Semicolon Expr Semicolon ForStmtA RightParenthesis;
+ForStmtA            ::= Expr |;
+ReturnStmt          ::= RETURN ForStmtA Semicolon;
+
+BreakStmt           ::= BREAK Semicolon;
+
+PrintStmt           ::= PRINT LeftParenthesis PrintStmtA RightParenthesis Semicolon;
+PrintStmtA          ::= Expr PrintStmtAa;
+PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
+
+Expr                ::= LValue Equal Expr 
+                      | Constant
+                      | Negation Expr
+                      | LValue
+                      | THIS
+                      | Call
+                      | LeftParenthesis Expr RightParenthesis 
+                      | Expr Arithmetic_Op Expr
+                      | Expr Comparison_op Expr
+                      | Expr Logical_Op Expr
+                      | NEW LeftParenthesis ident RightParenthesis
+                      | NEWARRAY LeftParenthesis Expr Comma Type RightParenthesis
+                      | READINTEGER LeftParenthesis RightParenthesis
+                      | READLINE LeftParenthesis RightParenthesis
+                      | MALLOC LeftParenthesis Expr RightParenthesis;
+
+LValue              ::= ident
+                      | Expr Point ident    
+                      | Expr LeftBrace Expr RightBrace;
+
+Call                ::= ident LeftParenthesis Actuals RightParenthesis
+                      | Expr Point ident LeftParenthesis Actuals RightParenthesis
+                      | Expr Point LibCall LeftParenthesis Actuals RightParenthesis;
+
+LibCall             ::= GETBYTE LeftParenthesis Expr RightParenthesis
+                      | SETBYTE LeftParenthesis Expr Comma Expr RightParenthesis;
+
+Actuals             ::= Expr ActualsA
+                      | ;
+ActualsA            ::= Comma Expr ActualsA |;
+
+Constant            ::= INTCONSTANT
+                      | DOUBLECONSTANT
+                      | BOOLCONSTANT
+                      | STRINGCONSTANT
+                      | NULL;
