@@ -61,7 +61,7 @@ public class Analizador_lexico {
         int lenghtB = 0;
         ERRORSNumber = 0;*/
         Parser P = new Parser(lexer);
-       // P.debug_parse();
+        //P.debug_parse();
         P.parse();
         result.add(P.ErrorM);        
         if(P.ErrorNumber == 0 && lexer.errornumber == 0 && lexer.errornumberLength == 0)

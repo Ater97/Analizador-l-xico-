@@ -40,11 +40,12 @@ non terminal        ProgramA, FormalsA, ClassDeclC, ClassDeclBb, ClassDeclB, Cla
 precedence left     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
+precedence left     Negation, Semicolon;
 
 precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+                    Arithmetic_Op, Equal,Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
  
-precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, Semicolon;
+precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident;
 
                     
 Program             ::= Decl ProgramA;
@@ -90,8 +91,8 @@ Prototype           ::= Type ident LeftParenthesis Formals RightParenthesis Semi
                       | VOID ident LeftParenthesis Formals RightParenthesis Semicolon;
 
 StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket;
-StmtBlockA          ::=  StmtBlockA  VariableDecl|;
-StmtBlockB          ::=  Stmt StmtBlockB|;
+StmtBlockA          ::= StmtBlockA  VariableDecl|;
+StmtBlockB          ::= Stmt StmtBlockB|;
 
 Stmt                ::= Expr Semicolon
                       | Semicolon
@@ -115,10 +116,11 @@ BreakStmt           ::= BREAK Semicolon;
 
 PrintStmt           ::= PRINT LeftParenthesis PrintStmtA RightParenthesis Semicolon;
 PrintStmtA          ::= Expr PrintStmtAa;
-PrintStmtAa         ::= Comma Expr PrintStmtAa |;
+PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
 Expr                ::= LValue Equal Expr 
                       | Constant
+                      | Negation Expr
                       | LValue
                       | THIS
                       | Call
@@ -126,7 +128,6 @@ Expr                ::= LValue Equal Expr
                       | Expr Arithmetic_Op Expr
                       | Expr Comparison_op Expr
                       | Expr Logical_Op Expr
-                      | Negation Expr
                       | NEW LeftParenthesis ident RightParenthesis
                       | NEWARRAY LeftParenthesis Expr Comma Type RightParenthesis
                       | READINTEGER LeftParenthesis RightParenthesis
@@ -145,7 +146,7 @@ LibCall             ::= GETBYTE LeftParenthesis Expr RightParenthesis
                       | SETBYTE LeftParenthesis Expr Comma Expr RightParenthesis;
 
 Actuals             ::= Expr ActualsA
-                      |;
+                      | ;
 ActualsA            ::= Comma Expr ActualsA |;
 
 Constant            ::= INTCONSTANT
