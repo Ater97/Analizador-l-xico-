@@ -38,15 +38,8 @@ import java_cup.runtime.*;
 
 /*Operators*/
 /*  (, ), +, -, *, /, %, <, <=, >, >=, ==, !=, &&, ||, !  */
-
 Comparison_op   = "<"|">"|"<="|">="|"=="|"!="
- 
-/*  |"==="|"<>"|"<=>"|"??"   */
-/*Arithmetic*/
-Equal           = "="
-Negation        = "!"|"-"
 Arithmetic_Op   = \+|\-|\*|\/|\%
-/*Logic*/
 Logical_Op      = "||"|"!"|"&&"
 
 /*Types*/
@@ -109,7 +102,8 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 {LeftParenthesis}   {return new Symbol(sym.LeftParenthesis, yyline, yycolumn, yytext());}
 {RightParenthesis}  {return new Symbol(sym.RightParenthesis, yyline, yycolumn, yytext());}
-{Equal}             {return new Symbol(sym.Equal, yyline, yycolumn, yytext());}
+"="                 {return new Symbol(sym.Equal, yyline, yycolumn, yytext());}
+
 "int"               {return new Symbol(sym.INT, yyline, yycolumn, yytext());} 
 "double"            {return new Symbol(sym.DOUBLE, yyline, yycolumn, yytext());} 
 "bool"              {return new Symbol(sym.BOOL, yyline, yycolumn, yytext());} 
@@ -140,14 +134,20 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 "GetByte"           {return new Symbol(sym.GETBYTE, yyline, yycolumn, yytext());} 
 "SetByte"           {return new Symbol(sym.SETBYTE, yyline, yycolumn, yytext());} 
 
-{Negation}          {return new Symbol(sym.Negation, yyline, yycolumn, yytext());}
+"-"                 {return new Symbol(sym.Negation, yyline, yycolumn, yytext());}
+"!"                 {return new Symbol(sym.EXCLA, yyline, yycolumn, yytext());}
+/*Comparison_op   = "<"|">"|"<="|">="|"=="|"!="*/
+"<"                 {return new Symbol(sym.Less, yyline, yycolumn, yytext());}
+">"                 {return new Symbol(sym.Greater, yyline, yycolumn, yytext());}
+
 {Comparison_op}     {return new Symbol(sym.Comparison_op, yyline, yycolumn, yytext());}
 {Arithmetic_Op}     {return new Symbol(sym.Arithmetic_Op, yyline, yycolumn, yytext());}
 {Logical_Op}        {return new Symbol(sym.Logical_Op, yyline, yycolumn, yytext());}
 
+
 {LeftBrace}         {return new Symbol(sym.LeftBrace, yyline, yycolumn, yytext());}
 {RightBrace}        {return new Symbol(sym.RightBrace, yyline, yycolumn, yytext());}
-{LeftBracket}       {return new Symbol(sym.LeftBracket, yyline, yycolumn, yytext());}
+"{"                 {return new Symbol(sym.LeftBracket, yyline, yycolumn, yytext());}
 {RightBracket}      {return new Symbol(sym.RightBracket, yyline, yycolumn, yytext());}
 {Semicolon}         {return new Symbol(sym.Semicolon, yyline, yycolumn, yytext());}
 {Comma}             {return new Symbol(sym.Comma, yyline, yycolumn, yytext());}

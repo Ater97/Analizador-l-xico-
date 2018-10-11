@@ -10,6 +10,7 @@ parser code  {:
    public void syntax_error(Symbol cur_token) {  
         ErrorNumber++;
         ErrorM += ErrorNumber + " Sintac Message Line: " + (cur_token.left+1) + " Col: " +(cur_token.right+1) + " Text: " + cur_token.value+"\n";
+    //    report_error("Error de sintaxis. Columna: " + (cur_token.right + 1) + " Linea: " + (cur_token.left+1) + ". Texto: \"" + cur_token.value + "\"", null);
    }
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
     {
@@ -23,6 +24,8 @@ terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS,
 
 terminal Object     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
                     Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+
+terminal Object     EXCLA, Less, Greater;
 
 terminal String     ident, STRINGCONSTANT;
 terminal Integer    INTCONSTANT;
@@ -40,12 +43,12 @@ non terminal        ProgramA, FormalsA, ClassDeclC, ClassDeclBb, ClassDeclB, Cla
 precedence left     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
-precedence left     Negation, Semicolon;
+precedence left     Semicolon;
 
 precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
                     Arithmetic_Op, Equal,Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
  
-precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident;
+precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, Negation, Less, Greater;
 
                     
 Program             ::= Decl ProgramA;
@@ -121,6 +124,10 @@ PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 Expr                ::= LValue Equal Expr 
                       | Constant
                       | Negation Expr
+                      | EXCLA Expr
+                      | Expr Negation Expr
+                      | Expr Less Expr
+                      | Expr Greater Expr
                       | LValue
                       | THIS
                       | Call

@@ -65,12 +65,15 @@ public class Analizador_lexico {
         P.parse();
         result.add(P.ErrorM);        
         if(P.ErrorNumber == 0 && lexer.errornumber == 0 && lexer.errornumberLength == 0)
-            System.out.println("Correct file :)");
+            System.out.println("Correct file :)\n Congrats!");
         else{
-        System.out.println(P.ErrorM + "\nSintac: " + P.ErrorNumber + 
-                        "\nLexic: " + lexer.errornumber + 
+        System.out.println(P.ErrorM + 
+                        "\n----------------------------------------------------\n"+
+                        "Analysis report"+ 
+                        "\nSintac: " + P.ErrorNumber + 
+                        "\nLexic : " + lexer.errornumber + 
                         "\nLength: " + lexer.errornumberLength + 
-                        "\nTotal: " + (P.ErrorNumber + lexer.errornumber + lexer.errornumberLength));
+                        "\nTotal : " + (P.ErrorNumber + lexer.errornumber + lexer.errornumberLength));
         }
         
         //createOUT(originalFile.getName(),originalFile.getPath(),result);
@@ -329,11 +332,8 @@ public class Analizador_lexico {
     public static void GenerateCupFile(String path, String Folderpath){
                           
         String[] commands = {/* "-expect", "32" ,*/"-destdir", Folderpath, "-parser", "Parser", path};
-        //String[] commands = {"-parser", "parser", path};
         try {
-            {
-                java_cup.Main.main(commands);
-            }
+            java_cup.Main.main(commands);
         } catch (Exception e) {
         }
     }
@@ -350,7 +350,7 @@ public class Analizador_lexico {
         
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             fileParse = fileChooser.getSelectedFile();
-            System.out.println("Save as file: " + fileParse.getAbsolutePath());}
+            System.out.println("File path: " + fileParse.getAbsolutePath());}
         else
             System.exit(0);
         return  fileParse;
