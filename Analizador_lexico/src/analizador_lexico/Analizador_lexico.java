@@ -32,14 +32,12 @@ public class Analizador_lexico {
      */
     
     public static void main(String[] args) throws IOException, Exception {
-        // TODO code application logic here
-        boolean flag = true;
+
         String path = new File(".").getCanonicalPath();
         GenerateLexerFile(path + "\\src\\analizador_lexico\\Lexer.flex");      
         GenerateCupFile(path + "\\src\\analizador_lexico\\parser.cup",path + "\\src\\analizador_lexico");
-        while(flag){
+        while(stay()){
             Analyzer();
-            flag = stay();
         }
         System.exit(0);
     }
@@ -342,10 +340,12 @@ public class Analizador_lexico {
     {
         File fileParse = null;
         JFrame parentFrame = new JFrame();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("mini C# Files", "frag");
+        FileNameExtensionFilter filterfrag = new FileNameExtensionFilter(".frag", "frag");
+        FileNameExtensionFilter filtertxt = new FileNameExtensionFilter(".txt", "txt");
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Specify a file");  
-        fileChooser.setFileFilter(filter);
+        fileChooser.addChoosableFileFilter(filterfrag);
+        fileChooser.addChoosableFileFilter(filtertxt);
         int userSelection = fileChooser.showSaveDialog(parentFrame);
         
         if (userSelection == JFileChooser.APPROVE_OPTION) {
