@@ -1,4 +1,4 @@
-Lexical analyser
+Lexical and Syntactic analyser
 
 When you run the program a file dialog will display, so you 
 can choose the file (.frag) to convert into .out the new file 
