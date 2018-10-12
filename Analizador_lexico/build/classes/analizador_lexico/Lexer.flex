@@ -48,8 +48,8 @@ Decimal         = [1-9][0-9]*|0
 Hexadecimal     = 0[xX][0-9a-fA-F]+
 Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
-Integers        = [+-]?{Decimal}|[+-]?{Hexadecimal}|[+-]?{Octal}|[+-]?{Binary}
-Double          = [+-]?([1-9][0-9]*|0)(\.)[0-9]*|{Exponent_Dnum}|[+-]?(({Lnum}|{Dnum})\.[eE][+-]? {Lnum})
+Integers        = {Decimal}|[+-]?{Hexadecimal}|[+-]?{Octal}|[+-]?{Binary}
+Double          = ([1-9][0-9]*|0)(\.)[0-9]*|{Exponent_Dnum}|[+-]?(({Lnum}|{Dnum})\.[eE][+-]? {Lnum})
 
 Point           = "."                                       
 Semicolon       = ";"
@@ -104,7 +104,7 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 {RightParenthesis}  {return new Symbol(sym.RightParenthesis, yyline, yycolumn, yytext());}
 "="                 {return new Symbol(sym.Equal, yyline, yycolumn, yytext());}
 
-"int"               {return new Symbol(sym.INT, yyline, yycolumn, yytext());} 
+"int"               {return new Symbol(sym.INT, yyline, yycolumn, yytext());}   
 "double"            {return new Symbol(sym.DOUBLE, yyline, yycolumn, yytext());} 
 "bool"              {return new Symbol(sym.BOOL, yyline, yycolumn, yytext());} 
 "string"            {return new Symbol(sym.STRING, yyline, yycolumn, yytext());} 
@@ -126,10 +126,7 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 "ReadInteger"       {return new Symbol(sym.READINTEGER, yyline, yycolumn, yytext());} 
 "ReadLine"          {return new Symbol(sym.READLINE, yyline, yycolumn, yytext());} 
 "Malloc"            {return new Symbol(sym.MALLOC, yyline, yycolumn, yytext());} 
-{Integers}          {return new Symbol(sym.INTCONSTANT, yyline, yycolumn, yytext());} 
-{Double}            {return new Symbol(sym.DOUBLECONSTANT, yyline, yycolumn, yytext());} 
-{Booleans}          {return new Symbol(sym.BOOLCONSTANT, yyline, yycolumn, yytext());} 
-{String}            {return new Symbol(sym.STRINGCONSTANT, yyline, yycolumn, yytext());} 
+ 
 "null"              {return new Symbol(sym.NULL, yyline, yycolumn, yytext());} 
 "GetByte"           {return new Symbol(sym.GETBYTE, yyline, yycolumn, yytext());} 
 "SetByte"           {return new Symbol(sym.SETBYTE, yyline, yycolumn, yytext());} 
@@ -143,7 +140,10 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 {Comparison_op}     {return new Symbol(sym.Comparison_op, yyline, yycolumn, yytext());}
 {Arithmetic_Op}     {return new Symbol(sym.Arithmetic_Op, yyline, yycolumn, yytext());}
 {Logical_Op}        {return new Symbol(sym.Logical_Op, yyline, yycolumn, yytext());}
-
+{Integers}          {return new Symbol(sym.INTCONSTANT, yyline, yycolumn, yytext());} 
+{Double}            {return new Symbol(sym.DOUBLECONSTANT, yyline, yycolumn, yytext());} 
+{Booleans}          {return new Symbol(sym.BOOLCONSTANT, yyline, yycolumn, yytext());} 
+{String}            {return new Symbol(sym.STRINGCONSTANT, yyline, yycolumn, yytext());}
 
 {LeftBrace}         {return new Symbol(sym.LeftBrace, yyline, yycolumn, yytext());}
 {RightBrace}        {return new Symbol(sym.RightBrace, yyline, yycolumn, yytext());}
