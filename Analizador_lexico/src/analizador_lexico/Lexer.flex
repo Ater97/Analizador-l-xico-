@@ -44,7 +44,7 @@ Logical_Op      = "||"|"!"|"&&"
 
 /*Types*/
 Booleans        =true|false
-Decimal         = [1-9][0-9]*|0
+Decimal         = [1-9][0-9]*|0*
 Hexadecimal     = 0[xX][0-9a-fA-F]+
 Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
