@@ -2,6 +2,7 @@
 package analizador_lexico;
 
 import java_cup.runtime.*;
+import SymbolTable; 
 
 %%
 %class Lexer
@@ -89,11 +90,6 @@ Punctuation     ={Point}|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|"[]
 
 CommentError    = (\/\*)(.)
 Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
-
-
-
-
-
 
 /*%state STRING*/
 
