@@ -7,6 +7,11 @@ parser code  {:
    public String ErrorM = "";
    public int ErrorNumber = 0;
 
+    public void RedToken (Symbol cur_token)
+    {
+        System.out.println(cur_token.value);
+    }
+
    public void syntax_error(Symbol cur_token) {  
         ErrorNumber++;
         ErrorM += ErrorNumber + " Sintac Message Line: " + (cur_token.left+1) + " Col: " +(cur_token.right+1) + " Text: " + cur_token.value+"\n";
@@ -64,7 +69,7 @@ Decl                ::= VariableDecl
 
 VariableDecl        ::= Variable Semicolon;
 Variable            ::= Type ident;
-Type                ::= INT
+Type                ::= INT {: RESULT ="int";:}
                       | DOUBLE
                       | BOOL
                       | STRING

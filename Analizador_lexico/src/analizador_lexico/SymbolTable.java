@@ -21,7 +21,7 @@ import java.util.Hashtable;
  * @author Sebastian
  */
 public class SymbolTable {
-    public HashMap<String,Symbol> SymbolHashtable;
+    public HashMap<String,ST> SymbolHashtable;
     public Integer countkey;
     
     public SymbolTable ()
@@ -32,7 +32,7 @@ public class SymbolTable {
     
     public void Insert(String name,String type, String value)
     {
-        SymbolHashtable.put(name, new Symbol(name, type, value));
+        SymbolHashtable.put(name, new ST(name, type, value));
         countkey++;
     }
     public boolean Search(String name)
@@ -40,14 +40,14 @@ public class SymbolTable {
         return SymbolHashtable.get(name) != null;
     }
     
-    public Symbol getSymbol (String name)
+    public ST getSymbol (String name)
     {
         return SymbolHashtable.get(name);
     }
     
     public void update (String name, String value)
     {
-        Symbol temp = getSymbol(name);
+        ST temp = getSymbol(name);
         temp.Value = value;
         SymbolHashtable.put(name, temp);
     }

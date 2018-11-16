@@ -2,8 +2,6 @@
 package analizador_lexico;
 
 import java_cup.runtime.*;
-import SymbolTable; 
-
 %%
 %class Lexer
 %unicode

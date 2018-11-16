@@ -9,12 +9,12 @@ package analizador_lexico;
  *
  * @author Sebastian
  */
-public class Symbol {
+public class ST {
     public String Name = "";
     public String Type = "";
     public String Value = "";
     
-    public Symbol(String name,String type,String value)
+    public ST(String name,String type,String value)
     {
         Name = name;
         Type = type;
