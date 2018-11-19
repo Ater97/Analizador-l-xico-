@@ -1,5 +1,5 @@
 package analizador_lexico;
-
+import java.util.ArrayList;
 import java_cup.runtime.*;
 
 parser code  {: 
@@ -23,25 +23,7 @@ parser code  {:
        
 :};
 action code {:
-    ScopeManagement scopeM = new ScopeManagement();
-    ArrayList<String> typesF = new ArrayList<>(0);
-    private static char type(Object obj){
-        if(obj == null){
-            return 'object';
-        }
-        else if(obj instanceof Integer){
-            return 'integer';
-        }
-        else if(obj instanceof Double){
-            return 'double';            
-        }
-        else if(obj instanceof Boolean){
-            return 'boolean';
-        }
-        else{
-            return 'e';
-        }
-    }
+    
 :}
 //--------------------------------------------------------------------------------
 terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
@@ -77,7 +59,7 @@ precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket
 precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, Negation, Less, Greater;
 
                     
-Program             ::= Decl ProgramA;
+Program             ::= Decl ProgramA {: :};
 ProgramA            ::= Decl ProgramA
                       |;
 
@@ -88,20 +70,20 @@ Decl                ::= VariableDecl
                       | error Semicolon
                       | error RightBracket;
 
-VariableDecl        ::= Variable Semicolon;
-Variable            ::= Type ident;
-Type                ::= INT {: RESULT ="int";:}
-                      | DOUBLE
-                      | BOOL
-                      | STRING
-                      | ident
-                      | Type LeftBracket RightBracket;
-FunctionDecl        ::= Type ident LeftParenthesis Formals RightParenthesis StmtBlock
-                      | VOID ident LeftParenthesis Formals RightParenthesis StmtBlock;
+VariableDecl        ::= Variable:v Semicolon {:RESULT = v;:};
+Variable            ::= Type:t ident:i {: RESULT = t;:};
+Type                ::= INT     {: RESULT ="int";:}
+                      | DOUBLE  {: RESULT ="double";:}
+                      | BOOL    {: RESULT ="bool";:}
+                      | STRING  {: RESULT ="string";:}
+                      | ident:i {: RESULT = i;:}
+                      | Type:t LeftBracket RightBracket{: RESULT = t;:}; 
+FunctionDecl        ::= Type:t ident:i LeftParenthesis Formals RightParenthesis StmtBlock
+                      | VOID:t ident:i LeftParenthesis Formals RightParenthesis StmtBlock;
 
-Formals             ::= Variable FormalsA
+Formals             ::= Variable:v FormalsA
                       |;
-FormalsA            ::= Comma Variable FormalsA
+FormalsA            ::= Comma Variable:v FormalsA
                       |;
 
 ClassDecl           ::= CLASS ident ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket;
@@ -147,8 +129,8 @@ PrintStmt           ::= PRINT LeftParenthesis PrintStmtA RightParenthesis Semico
 PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
-Expr                ::= LValue Equal Expr 
-                      | Constant
+Expr                ::= LValue:i Equal Expr:r 
+                      | Constant:c {:RESULT = c;:}
                       | Negation Expr
                       | EXCLA Expr
                       | Expr Negation Expr
