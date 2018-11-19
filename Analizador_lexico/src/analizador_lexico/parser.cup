@@ -31,7 +31,9 @@ terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
 
 terminal Object     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    Arithmetic_Op, Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+                    /*Arithmetic_Op,*/ Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+
+terminal Object     plus,minus,mult,div,mod;
 
 terminal Object     EXCLA, Less, Greater;
 
@@ -54,10 +56,12 @@ precedence left     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS,
 precedence left     Semicolon;
 
 precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    Arithmetic_Op, Equal,Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+                    /*Arithmetic_Op,*/ Equal,Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
  
 precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, Negation, Less, Greater;
 
+precedence left     plus,minus;
+precedence left     mult,div,mod;
                     
 Program             ::= Decl ProgramA {: :};
 ProgramA            ::= Decl ProgramA
@@ -140,7 +144,11 @@ Expr                ::= LValue:i Equal Expr:r
                       | THIS
                       | Call
                       | LeftParenthesis Expr RightParenthesis 
-                      | Expr Arithmetic_Op Expr
+                      | Expr plus Expr
+                      | Expr minus Expr
+                      | Expr mult Expr
+                      | Expr div Expr
+                      | Expr mod Expr
                       | Expr Comparison_op Expr
                       | Expr Logical_Op Expr
                       | NEW LeftParenthesis ident RightParenthesis

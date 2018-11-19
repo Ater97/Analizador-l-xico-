@@ -38,7 +38,7 @@ import java_cup.runtime.*;
 /*Operators*/
 /*  (, ), +, -, *, /, %, <, <=, >, >=, ==, !=, &&, ||, !  */
 Comparison_op   = "<"|">"|"<="|">="|"=="|"!="
-Arithmetic_Op   = \+|\-|\*|\/|\%
+/*Arithmetic_Op   = \+|\-|\*|\/|\%*/
 Logical_Op      = "||"|"!"|"&&"
 
 /*Types*/
@@ -132,7 +132,13 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 ">"                 {return new Symbol(sym.Greater, yyline, yycolumn, yytext());}
 
 {Comparison_op}     {return new Symbol(sym.Comparison_op, yyline, yycolumn, yytext());}
-{Arithmetic_Op}     {return new Symbol(sym.Arithmetic_Op, yyline, yycolumn, yytext());}
+/*{Arithmetic_Op}     {return new Symbol(sym.Arithmetic_Op, yyline, yycolumn, yytext());}*/
+"+"                 {return new Symbol(sym.plus, yyline, yycolumn, yytext());}
+"-"                 {return new Symbol(sym.minus, yyline, yycolumn, yytext());}
+"*"                 {return new Symbol(sym.mult, yyline, yycolumn, yytext());}
+"/"                 {return new Symbol(sym.div, yyline, yycolumn, yytext());}
+"%"                 {return new Symbol(sym.mod, yyline, yycolumn, yytext());}
+
 {Logical_Op}        {return new Symbol(sym.Logical_Op, yyline, yycolumn, yytext());}
 {Integers}          {return new Symbol(sym.INTCONSTANT, yyline, yycolumn, yytext());} 
 {Double}            {return new Symbol(sym.DOUBLECONSTANT, yyline, yycolumn, yytext());} 
