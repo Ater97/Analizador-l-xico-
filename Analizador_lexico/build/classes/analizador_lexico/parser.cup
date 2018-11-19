@@ -22,7 +22,28 @@ parser code  {:
     }
        
 :};
-
+action code {:
+    ScopeManagement scopeM = new ScopeManagement();
+    ArrayList<String> typesF = new ArrayList<>(0);
+    private static char type(Object obj){
+        if(obj == null){
+            return 'object';
+        }
+        else if(obj instanceof Integer){
+            return 'integer';
+        }
+        else if(obj instanceof Double){
+            return 'double';            
+        }
+        else if(obj instanceof Boolean){
+            return 'boolean';
+        }
+        else{
+            return 'e';
+        }
+    }
+:}
+//--------------------------------------------------------------------------------
 terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
@@ -36,11 +57,11 @@ terminal String     ident, STRINGCONSTANT;
 terminal Integer    INTCONSTANT;
 terminal Double     DOUBLECONSTANT;
 
-non terminal        Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
+non terminal Object Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
                     InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
                     BreakStmt, PrintStmt, Expr, LValue, Call, LibCall, Actuals, Constant;
 
-non terminal        ProgramA, FormalsA, ClassDeclC, ClassDeclBb, ClassDeclB, ClassDeclA, InterfaceDeclA, IfStmtA,
+non terminal Object ProgramA, FormalsA, ClassDeclC, ClassDeclBb, ClassDeclB, ClassDeclA, InterfaceDeclA, IfStmtA,
                     PrintStmtA, PrintStmtAa, ForStmtA, ActualsA, StmtBlockA, StmtBlockB;
 
 
