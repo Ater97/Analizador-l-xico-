@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 /**
  *
@@ -23,16 +22,16 @@ import java.util.Hashtable;
 public class SymbolTable {
     public HashMap<String,ST> SymbolHashtable;
     public Integer countkey;
-    
+    HashMap<String, String> dictionary = new HashMap<String, String>();
     public SymbolTable ()
     {
         SymbolHashtable = new HashMap<>();
         countkey = 0;
     }
     
-    public void Insert(String name,String type, String value)
+    public void Insert(String name,String scope,String type, String value)
     {
-        SymbolHashtable.put(name, new ST(name, type, value));
+        SymbolHashtable.put(name, new ST(name, scope, type, value));
         countkey++;
     }
     public boolean Search(String name)
@@ -50,6 +49,11 @@ public class SymbolTable {
         ST temp = getSymbol(name);
         temp.Value = value;
         SymbolHashtable.put(name, temp);
+    }
+    
+    public void insertPrint(String name,String type, String value, String ambito){
+        if(SymbolHashtable.get(name + ambito) == null)
+            dictionary.put(name + ambito, name + ambito + type + value);
     }
     
     

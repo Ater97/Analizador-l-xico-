@@ -43,12 +43,20 @@ Logical_Op      = "||"|"!"|"&&"
 
 /*Types*/
 Booleans        =true|false
-Decimal         = [1-9][0-9]*|0*
-Hexadecimal     = 0[xX][0-9a-fA-F]+
+Decimal         = ([1-9][0-9]*|0)
+decimal = ([1-9][0-9]*|0)
+Hexadecimal     = 0[xX][decimala-fA-F]+
 Octal           = 0[0-7]+
 Binary          = 0[bB][01]+
 Integers        = {Decimal}|[+-]?{Hexadecimal}|[+-]?{Octal}|[+-]?{Binary}
-Double          = ([1-9][0-9]*|0*)(\.)[0-9]*|{Exponent_Dnum}|[+-]?(({Lnum}|{Dnum})\.[eE][+-]? {Lnum})
+Double          = [0-9]+\.[0-9]*([eE][+-]?[0-9]+)?
+
+/*([1-9][0-9]*|0*)(\.)[0-9]*|{Exponent_Dnum}|[+-]?(({Lnum}|{Dnum})\.[eE][+-]? {Lnum})
+
+Lnum            = [0-9]+ 
+Dnum            = ([0-9]*[\.]{Lnum}) | ({Lnum}[\.][0-9]*)
+Exponent_Dnum   = [+-]?(({Lnum} | {Dnum}) [eE][+-]? {Lnum})*/
+
 
 Point           = "."                                       
 Semicolon       = ";"
@@ -68,9 +76,7 @@ String          =(\'(.|{Semicolon}|{Comma}|{Parenthesis}|{Brace}|{Bracket}|{Poin
 /*Functions*/
 /*Function = function*/
 /*Floating point numbers*/
-Lnum            = [0-9]+ 
-Dnum            = ([0-9]*[\.]{Lnum}) | ({Lnum}[\.][0-9]*)
-Exponent_Dnum   = [+-]?(({Lnum} | {Dnum}) [eE][+-]? {Lnum})
+
 
 
 
@@ -131,14 +137,14 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 "<"                 {return new Symbol(sym.Less, yyline, yycolumn, yytext());}
 ">"                 {return new Symbol(sym.Greater, yyline, yycolumn, yytext());}
 
-{Comparison_op}     {return new Symbol(sym.Comparison_op, yyline, yycolumn, yytext());}
+
 /*{Arithmetic_Op}     {return new Symbol(sym.Arithmetic_Op, yyline, yycolumn, yytext());}*/
 "+"                 {return new Symbol(sym.plus, yyline, yycolumn, yytext());}
-"-"                 {return new Symbol(sym.minus, yyline, yycolumn, yytext());}
 "*"                 {return new Symbol(sym.mult, yyline, yycolumn, yytext());}
 "/"                 {return new Symbol(sym.div, yyline, yycolumn, yytext());}
 "%"                 {return new Symbol(sym.mod, yyline, yycolumn, yytext());}
 
+{Comparison_op}     {return new Symbol(sym.Comparison_op, yyline, yycolumn, yytext());}
 {Logical_Op}        {return new Symbol(sym.Logical_Op, yyline, yycolumn, yytext());}
 {Integers}          {return new Symbol(sym.INTCONSTANT, yyline, yycolumn, yytext());} 
 {Double}            {return new Symbol(sym.DOUBLECONSTANT, yyline, yycolumn, yytext());} 

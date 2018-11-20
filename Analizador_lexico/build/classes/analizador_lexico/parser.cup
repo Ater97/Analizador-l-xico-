@@ -23,23 +23,30 @@ parser code  {:
        
 :};
 action code {:
-    
-:}
+            public String type (Object obj)
+            {
+                Integer temp;
+                if (obj instanceof Integer)
+                    temp = Integer.parseInt(String.valueOf(obj));
+                System.out.println(" \\ 0.0/ " + obj);
+                return "Str";
+            }
+        :}
 //--------------------------------------------------------------------------------
 terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
 
 terminal Object     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    /*Arithmetic_Op,*/ Equal, Negation, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+                    /*Arithmetic_Op,*/ Equal, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
 
-terminal Object     plus,minus,mult,div,mod;
+terminal Object     plus,Negation,mult,div,mod;
 
 terminal Object     EXCLA, Less, Greater;
 
 terminal String     ident, STRINGCONSTANT;
-terminal Integer    INTCONSTANT;
-terminal Double     DOUBLECONSTANT;
+terminal String    INTCONSTANT;
+terminal String     DOUBLECONSTANT;
 
 non terminal Object Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
                     InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
@@ -60,7 +67,7 @@ precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket
  
 precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, Negation, Less, Greater;
 
-precedence left     plus,minus;
+precedence left     plus,Negation;
 precedence left     mult,div,mod;
                     
 Program             ::= Decl ProgramA {: :};
@@ -133,32 +140,79 @@ PrintStmt           ::= PRINT LeftParenthesis PrintStmtA RightParenthesis Semico
 PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
-Expr                ::= LValue:i Equal Expr:r 
+Expr                ::= LValue:i Equal Expr:e 
                       | Constant:c {:RESULT = c;:}
                       | Negation Expr
                       | EXCLA Expr
-                      | Expr Negation Expr
+                      /*| Expr Negation Expr*/
                       | Expr Less Expr
                       | Expr Greater Expr
                       | LValue
                       | THIS
                       | Call
                       | LeftParenthesis Expr RightParenthesis 
-                      | Expr plus Expr
-                      | Expr minus Expr
-                      | Expr mult Expr
-                      | Expr div Expr
-                      | Expr mod Expr
+                      | Expr:e1 plus Expr:e2    {:if((type(e1) == "str") && (type(e2) == "str")){
+                                                RESULT = e1.toString() + e2.toString();
+                                                }else if ((type(e1) == "int") && (type(e2) == "int")) {
+                                                RESULT = ((Integer)e1) + ((Integer)e2);
+                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                RESULT = ((Double)e1) + ((Double)e2);
+                                                }else{
+                                                RESULT = null;
+                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                System.out.println("ERROR wrong types");
+                                                }
+                                                }:}
+                      | Expr:e1 Negation Expr:e2 {:if ((type(e1) == "int") && (type(e2) == "int")) {
+                                                RESULT = ((Integer)e1) - ((Integer)e2);
+                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                RESULT = ((Double)e1) - ((Double)e2);
+                                                }else{
+                                                RESULT = null;
+                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                System.out.println("ERROR wrong types");
+                                                }
+                                                }:}
+                      | Expr:e1 mult Expr:e2    {:if ((type(e1) == "int") && (type(e2) == "int")) {
+                                                RESULT = ((Integer)e1) * ((Integer)e2);
+                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                RESULT = ((Double)e1) * ((Double)e2);
+                                                }else{
+                                                RESULT = null;
+                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                System.out.println("ERROR wrong types");
+                                                }
+                                                }:}
+                      | Expr:e1 div Expr:e2     {:if ((type(e1) == "int") && (type(e2) == "int")) {
+                                                RESULT = ((Integer)e1) / ((Integer)e2);
+                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                RESULT = ((Double)e1) / ((Double)e2);
+                                                }else{
+                                                RESULT = null;
+                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                System.out.println("ERROR wrong types");
+                                                }
+                                                }:}
+                      | Expr:e1 mod Expr:e2 }   {:if ((type(e1) == "int") && (type(e2) == "int")) {
+                                                RESULT = ((Integer)e1) % ((Integer)e2);
+                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                RESULT = ((Double)e1) % ((Double)e2);
+                                                }else{
+                                                RESULT = null;
+                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                System.out.println("ERROR wrong types");
+                                                }
+                                                }:}
                       | Expr Comparison_op Expr
                       | Expr Logical_Op Expr
-                      | NEW LeftParenthesis ident RightParenthesis
+                      | NEW LeftParenthesis ident:i RightParenthesis
                       | NEWARRAY LeftParenthesis Expr Comma Type RightParenthesis
                       | READINTEGER LeftParenthesis RightParenthesis
                       | READLINE LeftParenthesis RightParenthesis
                       | MALLOC LeftParenthesis Expr RightParenthesis;
 
-LValue              ::= ident
-                      | Expr Point ident    
+LValue              ::= ident:i     {:RESULT = i;:}
+                      | Expr Point ident:i    
                       | Expr LeftBrace Expr RightBrace;
 
 Call                ::= ident LeftParenthesis Actuals RightParenthesis
@@ -170,10 +224,11 @@ LibCall             ::= GETBYTE LeftParenthesis Expr RightParenthesis
 
 Actuals             ::= Expr ActualsA
                       | ;
-ActualsA            ::= Comma Expr ActualsA |;
+ActualsA            ::= Comma Expr ActualsA 
+                      | ;
 
-Constant            ::= INTCONSTANT
-                      | DOUBLECONSTANT
-                      | BOOLCONSTANT
-                      | STRINGCONSTANT
+Constant            ::= INTCONSTANT:v       {:RESULT = v;:}
+                      | DOUBLECONSTANT:v    {:RESULT = v;:}
+                      | BOOLCONSTANT:v      {:RESULT = v;:}
+                      | STRINGCONSTANT:v    {:System.out.println(v);RESULT = v;:}
                       | NULL;
