@@ -32,9 +32,9 @@ action code {:
             if (obj instanceof Integer)
                 return "int";
             else if (obj instanceof Double)
-                return "doub";
+                return "double";
             else if (obj instanceof String)
-                return "str";
+                return "string";
             else if (obj instanceof Boolean)
                 return "bool";
             else 
@@ -62,10 +62,10 @@ action code {:
         {
             System.out.println("Search id " + id);
             if (scopes.empty())
-                if(ST.Search(id,"Global"))
-                    return true;
-                else 
-                    return false;
+                if(ST.Search(id,"Global")){
+                    return true;}
+                else {
+                    return false;}
             for (int i = scopes.size(); i > 0; --i) {
                 System.out.println("Current Scope: " + getStackElement(scopes,i));
                 if(ST.Search(id,getStackElement(scopes,i)))
@@ -104,8 +104,8 @@ terminal Object     plus,Negation,mult,div,mod;
 terminal Object     EXCLA, Less, Greater;
 
 terminal String     ident, STRINGCONSTANT;
-terminal String     INTCONSTANT;
-terminal String     DOUBLECONSTANT;
+terminal int        INTCONSTANT;
+terminal double     DOUBLECONSTANT;
 
 non terminal Object Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
                     InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
@@ -216,10 +216,13 @@ PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
 Expr                ::= LValue:i Equal Expr:e {:
                                         if(SearchSymbolTable(i.toString())){   
-                                            ST tmp = ST.getSymbol(i.toString(),checkScope());                  
-                                            RESULT = tmp.Value;}
-                                        else 
-                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
+                                            ST tmp = ST.getSymbol(i.toString(),checkScope());
+                                            if(getType(e) == tmp.Type){                  
+                                                RESULT = e;}
+                                            else{ 
+                                            System.out.println("ERROR wrong types" + i.toString() + " " + e.toString());}}
+                                        else {
+                                        System.out.println("ERROR the symbol isnt in the Symbol table");}:}
                       | Constant:c {:RESULT = c;:}
                       | Negation Expr
                       | EXCLA Expr
@@ -230,13 +233,13 @@ Expr                ::= LValue:i Equal Expr:e {:
                       | THIS
                       | Call
                       | LeftParenthesis Expr RightParenthesis 
-                      | Expr:e1 plus Expr:e2    {:if((getType(e1) == "str") && (getType(e2) == "str")){
+                      | Expr:e1 plus Expr:e2    {:if((getType(e1) == "string") && (getType(e2) == "string")){
                                                 RESULT = e1.toString() + e2.toString();}
                                                 else if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) + ((Integer)e2);}
-                                                else if ((getType(e1) == "doub") && (getType(e2) == "doub")) {
+                                                else if ((getType(e1) == "double") && (getType(e2) == "double")) {
                                                 RESULT = ((Integer)e1) + ((Integer)e2);}
-                                                else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
+                                                else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
                                                 RESULT = ((Double)e1) + ((Double)e2);}
                                                 else{
                                                 RESULT = null;
@@ -247,7 +250,7 @@ Expr                ::= LValue:i Equal Expr:e {:
                                                 }:}
                       | Expr:e1 Negation Expr:e2 {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) - ((Integer)e2);
-                                                }else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
+                                                }else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
                                                 RESULT = ((Double)e1) - ((Double)e2);
                                                 }else{
                                                 RESULT = null;
@@ -257,7 +260,7 @@ Expr                ::= LValue:i Equal Expr:e {:
                                                 }:}
                       | Expr:e1 mult Expr:e2    {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) * ((Integer)e2);
-                                                }else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
+                                                }else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
                                                 RESULT = ((Double)e1) * ((Double)e2);
                                                 }else{
                                                 RESULT = null;
@@ -267,7 +270,7 @@ Expr                ::= LValue:i Equal Expr:e {:
                                                 }:}
                       | Expr:e1 div Expr:e2     {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) / ((Integer)e2);
-                                                }else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
+                                                }else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
                                                 RESULT = ((Double)e1) / ((Double)e2);
                                                 }else{
                                                 RESULT = null;
@@ -277,7 +280,7 @@ Expr                ::= LValue:i Equal Expr:e {:
                                                 }:}
                       | Expr:e1 mod Expr:e2 }   {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) % ((Integer)e2);
-                                                }else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
+                                                }else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
                                                 RESULT = ((Double)e1) % ((Double)e2);
                                                 }else{
                                                 RESULT = null;
@@ -287,21 +290,38 @@ Expr                ::= LValue:i Equal Expr:e {:
                                                 }:}
                       | Expr Comparison_op Expr
                       | Expr Logical_Op Expr
-                      | NEW LeftParenthesis ident:i RightParenthesis
+                      | NEW LeftParenthesis ident:i RightParenthesis {:RESULT = i;
+                                        if(SearchSymbolTable(i.toString()))                     
+                                             RESULT = i;
+                                        else 
+                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
                       | NEWARRAY LeftParenthesis Expr Comma Type RightParenthesis
                       | READINTEGER LeftParenthesis RightParenthesis
                       | READLINE LeftParenthesis RightParenthesis
                       | MALLOC LeftParenthesis Expr RightParenthesis;
 
-LValue              ::= ident:i     {:if(SearchSymbolTable(i.toString()))                     
+LValue              ::= ident:i     {:RESULT = i;
+                                        if(SearchSymbolTable(i.toString()))                     
                                              RESULT = i;
-                                      else 
+                                        else 
                                         System.out.println("ERROR the symbol isnt in the Symbol table");:}
-                      | Expr Point ident:i    
+                      | Expr Point ident:i  {:RESULT = i;
+                                        if(SearchSymbolTable(i.toString()))                     
+                                             RESULT = i;
+                                        else 
+                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}  
                       | Expr LeftBrace Expr RightBrace;
 
-Call                ::= ident:i LeftParenthesis Actuals RightParenthesis
-                      | Expr Point ident:i LeftParenthesis Actuals RightParenthesis
+Call                ::= ident:i LeftParenthesis Actuals RightParenthesis{:RESULT = i;
+                                        if(SearchSymbolTable(i.toString()))                     
+                                             RESULT = i;
+                                        else 
+                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
+                      | Expr Point ident:i LeftParenthesis Actuals RightParenthesis{:RESULT = i;
+                                        if(SearchSymbolTable(i.toString()))                     
+                                             RESULT = i;
+                                        else 
+                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
                       | Expr Point LibCall LeftParenthesis Actuals RightParenthesis;
 
 LibCall             ::= GETBYTE LeftParenthesis Expr RightParenthesis

@@ -146,9 +146,9 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 
 {Comparison_op}     {return new Symbol(sym.Comparison_op, yyline, yycolumn, yytext());}
 {Logical_Op}        {return new Symbol(sym.Logical_Op, yyline, yycolumn, yytext());}
-{Integers}          {return new Symbol(sym.INTCONSTANT, yyline, yycolumn, yytext());} 
-{Double}            {return new Symbol(sym.DOUBLECONSTANT, yyline, yycolumn, yytext());} 
-{Booleans}          {return new Symbol(sym.BOOLCONSTANT, yyline, yycolumn, yytext());} 
+{Integers}          {return new Symbol(sym.INTCONSTANT, yyline, yycolumn, new Integer(yytext()));} 
+{Double}            {return new Symbol(sym.DOUBLECONSTANT, yyline, yycolumn, new Double(yytext()));} 
+{Booleans}          {return new Symbol(sym.BOOLCONSTANT, yyline, yycolumn, new Boolean(yytext()));} 
 {String}            {return new Symbol(sym.STRINGCONSTANT, yyline, yycolumn, yytext());}
 
 {LeftBrace}         {return new Symbol(sym.LeftBrace, yyline, yycolumn, yytext());}
