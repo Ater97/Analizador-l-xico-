@@ -4,14 +4,8 @@ import java.util.*;
 import java_cup.runtime.*;
 
 parser code  {: 
-    
     public String ErrorM = "";
     public int ErrorNumber = 0;
-
-    public void ReadToken (Symbol cur_token)
-    {
-        System.out.println("ReadToken " + cur_token.value);
-    }
 
    public void syntax_error(Symbol cur_token) {  
         ErrorNumber++;
@@ -26,9 +20,8 @@ parser code  {:
 action code {:
         public SymbolTable ST = new SymbolTable();
         public Stack<String> scopes = new Stack<>();
-        public static String toprint = "";
-        public String getType (Object obj)
-        {
+
+        public String getType (Object obj){
             Integer temp;
             if (obj instanceof Integer)
                 return "int";
@@ -130,7 +123,7 @@ precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, N
 precedence left     plus,Negation;
 precedence left     mult,div,mod;
                     
-Program             ::= Decl ProgramA {:toprint = ST.DictionaryToString();:};
+Program             ::= Decl ProgramA {:ST.DictionaryToPrint();:};
 ProgramA            ::= Decl ProgramA
                       |;
 

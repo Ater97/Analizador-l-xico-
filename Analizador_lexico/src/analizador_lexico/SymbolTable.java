@@ -68,4 +68,29 @@ public class SymbolTable {
         }
         return temp;
     }
+    
+    public void DictionaryToPrint() throws IOException, IOException, IOException
+    {
+        String staticPath = Analizador_lexico.staticPath;
+        System.out.println(staticPath);
+        //CreateFile(staticPath, staticPath, DictionaryToString());
+    }
+
+    public static void CreateFile(String filename, String path, String MainList) throws IOException
+    {
+        
+        path = path.replace(filename, "");
+        filename = filename.replace(".frag", "");  
+        filename = filename.replace(".txt", ""); 
+        File fout = new File(path,filename+".out");
+	FileOutputStream fos = new FileOutputStream(fout);
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))) {
+            bw.write(MainList);
+            /*for (int i = 0; i < MainList.size(); i++) {
+                if(!MainList.get(i).equals("\r") && !MainList.get(i).isEmpty() && !MainList.get(i).equals("") && !MainList.get(i).equals("\n")){
+                    bw.write(MainList.get(i));
+                    bw.newLine();}
+            }*/
+        }
+    }
 }

@@ -4,7 +4,6 @@ import java.util.*;
 import java_cup.runtime.*;
 
 parser code  {: 
-    public String toprint = "";
     public String ErrorM = "";
     public int ErrorNumber = 0;
 
@@ -21,8 +20,8 @@ parser code  {:
 action code {:
         public SymbolTable ST = new SymbolTable();
         public Stack<String> scopes = new Stack<>();
-        public String getType (Object obj)
-        {
+
+        public String getType (Object obj){
             Integer temp;
             if (obj instanceof Integer)
                 return "int";
@@ -124,7 +123,7 @@ precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, N
 precedence left     plus,Negation;
 precedence left     mult,div,mod;
                     
-Program             ::= Decl ProgramA {:toprint = ST.DictionaryToString();:};
+Program             ::= Decl ProgramA {:ST.DictionaryToPrint();:};
 ProgramA            ::= Decl ProgramA
                       |;
 

@@ -30,7 +30,7 @@ public class Analizador_lexico {
      * @param args the command line arguments
      * @throws java.io.IOException
      */
-    
+    public static String staticPath = "";
     public static void main(String[] args) throws IOException, Exception {
 
         String path = new File(".").getCanonicalPath();
@@ -56,7 +56,7 @@ public class Analizador_lexico {
         //P.debug_parse();
         P.parse();
         result.add(P.ErrorM);        
-        //ToPrint.add(P.toprint);
+        
         if(P.ErrorNumber == 0 && lexer.errornumber == 0 && lexer.errornumberLength == 0)
             System.out.println("Correct file :) Congrats!");
         else{
@@ -102,7 +102,10 @@ public class Analizador_lexico {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             fileParse = fileChooser.getSelectedFile();
             
-            System.out.println("File path: " + fileParse.getAbsolutePath());}
+            System.out.println("File path: " + fileParse.getAbsolutePath());
+            staticPath = fileParse.getAbsolutePath();
+        }
+            
         else
             System.exit(0);
         return  fileParse;
@@ -117,19 +120,5 @@ public class Analizador_lexico {
         return dialogResult == JOptionPane.YES_OPTION;
     } 
        
-       public static void CreateFile(String filename, String path, ArrayList<String> MainList) throws IOException
-    {
-        path = path.replace(filename, "");
-        filename = filename.replace(".frag", "");  
-        filename = filename.replace(".txt", ""); 
-        File fout = new File(path,filename+".out");
-	FileOutputStream fos = new FileOutputStream(fout);
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))) {
-            for (int i = 0; i < MainList.size(); i++) {
-                if(!MainList.get(i).equals("\r") && !MainList.get(i).isEmpty() && !MainList.get(i).equals("") && !MainList.get(i).equals("\n")){
-                    bw.write(MainList.get(i));
-                    bw.newLine();}
-            }
-        }
-    }
+    
 }
