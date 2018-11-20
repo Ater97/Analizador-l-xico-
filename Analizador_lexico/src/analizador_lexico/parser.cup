@@ -60,19 +60,35 @@ action code {:
         }
         public Boolean SearchSymbolTable(String id)
         {
-            System.out.println(id);
+            System.out.println("Search id " + id);
             if (scopes.empty())
                 if(ST.Search(id,"Global"))
                     return true;
                 else 
                     return false;
             for (int i = scopes.size(); i > 0; --i) {
-                if(ST.Search(id,scopes[i]))
+                System.out.println("Current Scope: " + getStackElement(scopes,i));
+                if(ST.Search(id,getStackElement(scopes,i)))
                     return true;
             }
             return false;
         }
 
+        public static <T> T getStackElement(Stack<T> stack, int index) {
+            if(!stack.empty())
+            {
+                if (index == 0) {
+                    return stack.peek();
+                }
+                T x = stack.pop();
+                try {
+                    return getStackElement(stack, index - 1);
+                } finally {
+                    stack.push(x);
+                }
+            }
+            return null;
+        }
 
     :}
 //--------------------------------------------------------------------------------
@@ -125,7 +141,7 @@ Decl                ::= VariableDecl
                       | error RightBracket {: quitScope();:};
 
 VariableDecl        ::= Variable:v Semicolon {:RESULT = v;:};
-Variable            ::= Type:t ident:i {: if(!SearchSymbolTable(i.toString())){
+Variable            ::= Type:t ident:i {: if(!ST.Search(i,checkScope())){
                                             RESULT = t; 
                                             ST.Insert(i.toString(),checkScope(),t.toString(),null);}
                                             :};
@@ -135,18 +151,30 @@ Type                ::= INT     {: RESULT ="int";:}
                       | STRING  {: RESULT ="string";:}
                       | ident:i {: RESULT = i;:}
                       | Type:t LeftBracket RightBracket{: RESULT = t; quitScope();:}; 
-FunctionDecl        ::= Type:t ident:i LeftParenthesis Formals RightParenthesis StmtBlock {:newScope(i.toString());:}
-                      | VOID:t ident:i LeftParenthesis Formals RightParenthesis StmtBlock {:newScope(i.toString());:};
+FunctionDecl        ::= Type:t ident:i {: if(!ST.Search(i,checkScope())){
+                                            RESULT = t; 
+                                            ST.Insert(i.toString(),checkScope(),t.toString(),null);}
+                                            :}LeftParenthesis Formals RightParenthesis StmtBlock {:newScope(i.toString());:}
+                      | VOID:t ident:i {: if(!ST.Search(i,checkScope())){
+                                            RESULT = t; 
+                                            ST.Insert(i.toString(),checkScope(),"Void",null);}
+                                            :}LeftParenthesis Formals RightParenthesis StmtBlock {:newScope(i.toString());:};
 
 Formals             ::= Variable:v FormalsA
                       |;
 FormalsA            ::= Comma Variable:v FormalsA
                       |;
 
-ClassDecl           ::= CLASS ident:i {:newScope(i.toString());:} ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket {: quitScope();:};
-ClassDeclA          ::= EXTENDS ident |;
-ClassDeclB          ::= IMPLEMENTS ident ClassDeclBb |;
-ClassDeclBb         ::= Comma ident ClassDeclBb |;
+ClassDecl           ::= CLASS ident:i {:newScope(i.toString());:}{: if(!ST.Search(i,checkScope())){
+                                            ST.Insert(i.toString(),checkScope(),"Class",null);}
+                                            :} ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket {: quitScope();:};
+ClassDeclA          ::= EXTENDS ident:i {: if(!ST.Search(i,checkScope())){
+                                            ST.Insert(i.toString(),checkScope(),"Extends",null);}
+                                            :}|;
+ClassDeclB          ::= IMPLEMENTS ident:i ClassDeclBb {: if(!ST.Search(i,checkScope())){ 
+                                            ST.Insert(i.toString(),checkScope(),"Implements",null);}
+                                            :}|;
+ClassDeclBb         ::= Comma ident:i ClassDeclBb |;
 ClassDeclC          ::= Field ClassDeclC |;
 
 Field               ::= VariableDecl 
