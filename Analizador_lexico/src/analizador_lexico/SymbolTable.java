@@ -57,7 +57,6 @@ public class SymbolTable {
     }
     
     
-    
     public static void CreateFile(String filename, String path, ArrayList<String> MainList) throws IOException
     {
         path = path.replace(filename, "");
