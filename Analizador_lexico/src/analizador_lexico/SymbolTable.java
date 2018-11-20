@@ -29,33 +29,36 @@ public class SymbolTable {
         countkey = 0;
     }
     
-    public void Insert(String name,String scope,String type, String value)
-    {
-        SymbolHashtable.put(name, new ST(name, scope, type, value));
-        countkey++;
-    }
-    public boolean Search(String name)
-    {
-        return SymbolHashtable.get(name) != null;
-    }
     
-    public ST getSymbol (String name)
-    {
-        return SymbolHashtable.get(name);
-    }
-    
-    public void update (String name, String value)
-    {
-        ST temp = getSymbol(name);
-        temp.Value = value;
-        SymbolHashtable.put(name, temp);
-    }
-    
-    public void insertPrint(String name,String type, String value, String ambito){
+    public void Insert(String name,String ambito,String type, String value){
         if(SymbolHashtable.get(name + ambito) == null)
+        {
             dictionary.put(name + ambito, name + ambito + type + value);
+            SymbolHashtable.put(name + ambito, new ST(name,ambito,type,value));
+            System.out.println("Successful Insert " +name + " " + ambito);
+        }   
     }
     
+    public boolean Search(String name, String ambito)
+    {
+        if(SymbolHashtable.get(name+ambito) != null)
+            return  true;
+        return false;
+    }
+    
+    public ST getSymbol (String name, String ambito)
+    {
+        return SymbolHashtable.get(name+ ambito);
+    }
+    
+    public void update (String name, String ambito, String value)
+    {
+        ST temp = getSymbol(name, ambito);
+        temp.Value = value;
+        SymbolHashtable.put(name + ambito, temp);
+    }
+    
+
     
     public static void CreateFile(String filename, String path, ArrayList<String> MainList) throws IOException
     {

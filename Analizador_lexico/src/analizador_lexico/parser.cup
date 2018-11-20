@@ -1,5 +1,6 @@
 package analizador_lexico;
-import java.util.ArrayList;
+/*import java.util.ArrayList;*/
+import java.util.*;
 import java_cup.runtime.*;
 
 parser code  {: 
@@ -23,25 +24,57 @@ parser code  {:
        
 :};
 action code {:
-            public String type (Object obj)
-            {
-                Integer temp;
-                if (obj instanceof Integer)
-                    return "int";
-                else if (obj instanceof Double)
-                    return "doub";
-                else if (obj instanceof String)
-                    return "str";
-                else if (obj instanceof Boolean)
-                    return "doub";
+        SymbolTable ST = new SymbolTable();
+        Stack<String> scopes = new Stack<>();
+        public String getType (Object obj)
+        {
+            Integer temp;
+            if (obj instanceof Integer)
+                return "int";
+            else if (obj instanceof Double)
+                return "doub";
+            else if (obj instanceof String)
+                return "str";
+            else if (obj instanceof Boolean)
+                return "bool";
+            else 
+                return "n";
+            //temp = Integer.parseInt(String.valueOf(obj));
+            //System.out.println(" \\ 0.0/ " + obj);
+        }
+        public String checkScope(){
+            if (scopes.empty())
+                return "Global";
+            return scopes.peek();
+        }
+        public void newScope(String ambito)
+        {
+            if(ST.Search(ambito,checkScope()))
+                    System.out.println("Error two scopes with the same name" +ambito +checkScope() );
+            else
+            scopes.push(ambito);
+        }
+        public void quitScope(){
+            if (!scopes.empty())
+                    scopes.pop();
+        }
+        public Boolean SearchSymbolTable(String id)
+        {
+            System.out.println(id);
+            if (scopes.empty())
+                if(ST.Search(id,"Global"))
+                    return true;
                 else 
-                    return "n";
-                //temp = Integer.parseInt(String.valueOf(obj));
-                //System.out.println(" \\ 0.0/ " + obj);
+                    return false;
+            for (int i = scopes.size(); i > 0; --i) {
+                if(ST.Search(id,scopes[i]))
+                    return true;
             }
+            return false;
+        }
 
 
-        :}
+    :}
 //--------------------------------------------------------------------------------
 terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
@@ -89,25 +122,28 @@ Decl                ::= VariableDecl
                       | ClassDecl
                       | InterfaceDecl
                       | error Semicolon
-                      | error RightBracket;
+                      | error RightBracket {: quitScope();:};
 
 VariableDecl        ::= Variable:v Semicolon {:RESULT = v;:};
-Variable            ::= Type:t ident:i {: RESULT = t;:};
+Variable            ::= Type:t ident:i {: if(!SearchSymbolTable(i.toString())){
+                                            RESULT = t; 
+                                            ST.Insert(i.toString(),checkScope(),t.toString(),null);}
+                                            :};
 Type                ::= INT     {: RESULT ="int";:}
                       | DOUBLE  {: RESULT ="double";:}
                       | BOOL    {: RESULT ="bool";:}
                       | STRING  {: RESULT ="string";:}
                       | ident:i {: RESULT = i;:}
-                      | Type:t LeftBracket RightBracket{: RESULT = t;:}; 
-FunctionDecl        ::= Type:t ident:i LeftParenthesis Formals RightParenthesis StmtBlock
-                      | VOID:t ident:i LeftParenthesis Formals RightParenthesis StmtBlock;
+                      | Type:t LeftBracket RightBracket{: RESULT = t; quitScope();:}; 
+FunctionDecl        ::= Type:t ident:i LeftParenthesis Formals RightParenthesis StmtBlock {:newScope(i.toString());:}
+                      | VOID:t ident:i LeftParenthesis Formals RightParenthesis StmtBlock {:newScope(i.toString());:};
 
 Formals             ::= Variable:v FormalsA
                       |;
 FormalsA            ::= Comma Variable:v FormalsA
                       |;
 
-ClassDecl           ::= CLASS ident ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket;
+ClassDecl           ::= CLASS ident:i {:newScope(i.toString());:} ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket {: quitScope();:};
 ClassDeclA          ::= EXTENDS ident |;
 ClassDeclB          ::= IMPLEMENTS ident ClassDeclBb |;
 ClassDeclBb         ::= Comma ident ClassDeclBb |;
@@ -116,13 +152,13 @@ ClassDeclC          ::= Field ClassDeclC |;
 Field               ::= VariableDecl 
                       | FunctionDecl;
 
-InterfaceDecl       ::= INTERFACE ident LeftBracket InterfaceDeclA RightBracket;
+InterfaceDecl       ::= INTERFACE ident:i {:newScope(i.toString());:} LeftBracket InterfaceDeclA RightBracket{: quitScope();:};
 InterfaceDeclA      ::= Prototype InterfaceDeclA |;
 
 Prototype           ::= Type ident LeftParenthesis Formals RightParenthesis Semicolon
                       | VOID ident LeftParenthesis Formals RightParenthesis Semicolon;
 
-StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket;
+StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket {: quitScope();:};
 StmtBlockA          ::= StmtBlockA  VariableDecl|;
 StmtBlockB          ::= Stmt StmtBlockB|;
 
@@ -150,7 +186,12 @@ PrintStmt           ::= PRINT LeftParenthesis PrintStmtA RightParenthesis Semico
 PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
-Expr                ::= LValue:i Equal Expr:e 
+Expr                ::= LValue:i Equal Expr:e {:
+                                        if(SearchSymbolTable(i.toString())){   
+                                            ST tmp = ST.getSymbol(i.toString(),checkScope());                  
+                                            RESULT = tmp.Value;}
+                                        else 
+                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
                       | Constant:c {:RESULT = c;:}
                       | Negation Expr
                       | EXCLA Expr
@@ -161,55 +202,58 @@ Expr                ::= LValue:i Equal Expr:e
                       | THIS
                       | Call
                       | LeftParenthesis Expr RightParenthesis 
-                      | Expr:e1 plus Expr:e2    {:if((type(e1) == "str") && (type(e2) == "str")){
-                                                RESULT = e1.toString() + e2.toString();
-                                                }else if ((type(e1) == "int") && (type(e2) == "int")) {
-                                                RESULT = ((Integer)e1) + ((Integer)e2);
-                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
-                                                RESULT = ((Double)e1) + ((Double)e2);
-                                                }else{
+                      | Expr:e1 plus Expr:e2    {:if((getType(e1) == "str") && (getType(e2) == "str")){
+                                                RESULT = e1.toString() + e2.toString();}
+                                                else if ((getType(e1) == "int") && (getType(e2) == "int")) {
+                                                RESULT = ((Integer)e1) + ((Integer)e2);}
+                                                else if ((getType(e1) == "doub") && (getType(e2) == "doub")) {
+                                                RESULT = ((Integer)e1) + ((Integer)e2);}
+                                                else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
+                                                RESULT = ((Double)e1) + ((Double)e2);}
+                                                else{
                                                 RESULT = null;
-                                                if ((type(e1) != "n") && (type(e2) != "n")){
-                                                System.out.println("ERROR wrong types" + e1 + " " + e2);
+                                                System.out.println("UNKONW types" + e1 + " " + e2);
+                                                if ((getType(e1) != "n") && (getType(e2) != "n")){
+                                                    System.out.println("ERROR wrong types" + e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr:e1 Negation Expr:e2 {:if ((type(e1) == "int") && (type(e2) == "int")) {
+                      | Expr:e1 Negation Expr:e2 {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) - ((Integer)e2);
-                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                }else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
                                                 RESULT = ((Double)e1) - ((Double)e2);
                                                 }else{
                                                 RESULT = null;
-                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                 System.out.println("ERROR wrong types"+ e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr:e1 mult Expr:e2    {:if ((type(e1) == "int") && (type(e2) == "int")) {
+                      | Expr:e1 mult Expr:e2    {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) * ((Integer)e2);
-                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                }else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
                                                 RESULT = ((Double)e1) * ((Double)e2);
                                                 }else{
                                                 RESULT = null;
-                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                 System.out.println("ERROR wrong types"+ e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr:e1 div Expr:e2     {:if ((type(e1) == "int") && (type(e2) == "int")) {
+                      | Expr:e1 div Expr:e2     {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) / ((Integer)e2);
-                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                }else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
                                                 RESULT = ((Double)e1) / ((Double)e2);
                                                 }else{
                                                 RESULT = null;
-                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                 System.out.println("ERROR wrong types"+ e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr:e1 mod Expr:e2 }   {:if ((type(e1) == "int") && (type(e2) == "int")) {
+                      | Expr:e1 mod Expr:e2 }   {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
                                                 RESULT = ((Integer)e1) % ((Integer)e2);
-                                                }else if (((type(e1) == "int")||(type(e1) == "doub")) && ((type(e2) == "int")||(type(e2) == "doub"))) {
+                                                }else if (((getType(e1) == "int")||(getType(e1) == "doub")) && ((getType(e2) == "int")||(getType(e2) == "doub"))) {
                                                 RESULT = ((Double)e1) % ((Double)e2);
                                                 }else{
                                                 RESULT = null;
-                                                if ((type(e1) != "n") && (type(e2) != "n")){
+                                                if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                 System.out.println("ERROR wrong types"+ e1 + " " + e2);
                                                 }
                                                 }:}
@@ -221,7 +265,10 @@ Expr                ::= LValue:i Equal Expr:e
                       | READLINE LeftParenthesis RightParenthesis
                       | MALLOC LeftParenthesis Expr RightParenthesis;
 
-LValue              ::= ident:i     {:RESULT = i;:}
+LValue              ::= ident:i     {:if(SearchSymbolTable(i.toString()))                     
+                                             RESULT = i;
+                                      else 
+                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
                       | Expr Point ident:i    
                       | Expr LeftBrace Expr RightBrace;
 
@@ -237,8 +284,8 @@ Actuals             ::= Expr ActualsA
 ActualsA            ::= Comma Expr ActualsA 
                       | ;
 
-Constant            ::= INTCONSTANT:v       {:RESULT = v;:}
-                      | DOUBLECONSTANT:v    {:RESULT = v;:}
-                      | BOOLCONSTANT:v      {:RESULT = v;:}
-                      | STRINGCONSTANT:v    {:System.out.println(" \\ STRINGCONSTANT / "+v);RESULT = v;:}
+Constant            ::= INTCONSTANT:v       {:/*System.out.println(" \\ INTCONSTANT / "+v);*/RESULT = v;:}
+                      | DOUBLECONSTANT:v    {:/*System.out.println(" \\ DOUBLECONSTANT / "+v);*/RESULT = v;:}
+                      | BOOLCONSTANT:v      {:/*System.out.println(" \\ BOOLCONSTANT / "+v);*/RESULT = v;:}
+                      | STRINGCONSTANT:v    {:/*System.out.println(" \\ STRINGCONSTANT / "+v);*/RESULT = v;:}
                       | NULL;
