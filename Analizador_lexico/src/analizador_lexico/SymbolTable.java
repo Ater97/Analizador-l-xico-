@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.FileNameMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,18 +23,17 @@ import java.util.HashMap;
 public class SymbolTable {
     public HashMap<String,ST> SymbolHashtable;
     public Integer countkey;
-    HashMap<String, String> dictionary = new HashMap<String, String>();
+   // HashMap<String, String> dictionary = new HashMap<String, String>();
     public SymbolTable ()
     {
         SymbolHashtable = new HashMap<>();
         countkey = 0;
     }
     
-    
     public void Insert(String name,String ambito,String type, String value){
         if(SymbolHashtable.get(name + ambito) == null)
         {
-            dictionary.put(name + ambito, name + ambito + type + value);
+            //dictionary.put(name + ambito, name + ambito + type + value);
             SymbolHashtable.put(name + ambito, new ST(name,ambito,type,value));
             System.out.println("Successful Insert " +name + " " + ambito);
         }   
@@ -57,22 +57,15 @@ public class SymbolTable {
         temp.Value = value;
         SymbolHashtable.put(name + ambito, temp);
     }
-    
-
-    
-    public static void CreateFile(String filename, String path, ArrayList<String> MainList) throws IOException
+ 
+    public String DictionaryToString()
     {
-        path = path.replace(filename, "");
-        filename = filename.replace(".frag", "");  
-        File fout = new File(path,filename+".out");
-	FileOutputStream fos = new FileOutputStream(fout);
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))) {
-            for (int i = 0; i < MainList.size(); i++) {
-                if(!MainList.get(i).equals("\r") && !MainList.get(i).isEmpty() && !MainList.get(i).equals("") && !MainList.get(i).equals("\n")){
-                    bw.write(MainList.get(i));
-                    bw.newLine();}
-            }
+        String temp = "";
+        ArrayList<ST> aux = new ArrayList<>();
+        aux.addAll(SymbolHashtable.values());
+        for (int i = 0; i < aux.size(); i++) {
+            temp += aux.get(i).Name + " " + aux.get(i).Scope + " " + aux.get(i).Type + " " + aux.get(i).Value + "\n" ;
         }
+        return temp;
     }
-    
 }

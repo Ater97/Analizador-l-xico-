@@ -4,14 +4,9 @@ import java.util.*;
 import java_cup.runtime.*;
 
 parser code  {: 
-
-   public String ErrorM = "";
-   public int ErrorNumber = 0;
-
-    public void ReadToken (Symbol cur_token)
-    {
-        System.out.println("ReadToken " + cur_token.value);
-    }
+    public String toprint = "";
+    public String ErrorM = "";
+    public int ErrorNumber = 0;
 
    public void syntax_error(Symbol cur_token) {  
         ErrorNumber++;
@@ -24,8 +19,8 @@ parser code  {:
        
 :};
 action code {:
-        SymbolTable ST = new SymbolTable();
-        Stack<String> scopes = new Stack<>();
+        public SymbolTable ST = new SymbolTable();
+        public Stack<String> scopes = new Stack<>();
         public String getType (Object obj)
         {
             Integer temp;
@@ -94,7 +89,7 @@ action code {:
 //--------------------------------------------------------------------------------
 terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
-                    READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
+                    READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE,INCLUDE;
 
 terminal Object     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
                     /*Arithmetic_Op,*/ Equal, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
@@ -129,7 +124,7 @@ precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, N
 precedence left     plus,Negation;
 precedence left     mult,div,mod;
                     
-Program             ::= Decl ProgramA {: :};
+Program             ::= Decl ProgramA {:toprint = ST.DictionaryToString();:};
 ProgramA            ::= Decl ProgramA
                       |;
 
@@ -214,13 +209,15 @@ PrintStmt           ::= PRINT LeftParenthesis PrintStmtA RightParenthesis Semico
 PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
-Expr                ::= LValue:i Equal Expr:e {:
+Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                         if(SearchSymbolTable(i.toString())){   
                                             ST tmp = ST.getSymbol(i.toString(),checkScope());
+                                            System.out.println("Tipo LValue "+ i.toString() +" "+ tmp.Type +" Tipo Expr " + getType(e));
                                             if(getType(e) == tmp.Type){                  
                                                 RESULT = e;}
                                             else{ 
-                                            System.out.println("ERROR wrong types" + i.toString() + " " + e.toString());}}
+                                            System.out.println("ERROR wrong types" + i.toString() + " " + e.toString());}
+                                            }
                                         else {
                                         System.out.println("ERROR the symbol isnt in the Symbol table");}:}
                       | Constant:c {:RESULT = c;:}
@@ -229,7 +226,7 @@ Expr                ::= LValue:i Equal Expr:e {:
                       /*| Expr Negation Expr*/
                       | Expr Less Expr
                       | Expr Greater Expr
-                      | LValue
+                      | LValue: i {:RESULT = i;:}
                       | THIS
                       | Call
                       | LeftParenthesis Expr RightParenthesis 
@@ -301,15 +298,12 @@ Expr                ::= LValue:i Equal Expr:e {:
                       | MALLOC LeftParenthesis Expr RightParenthesis;
 
 LValue              ::= ident:i     {:RESULT = i;
+                                            System.out.println("LValue " + i.toString());
                                         if(SearchSymbolTable(i.toString()))                     
                                              RESULT = i;
                                         else 
                                         System.out.println("ERROR the symbol isnt in the Symbol table");:}
-                      | Expr Point ident:i  {:RESULT = i;
-                                        if(SearchSymbolTable(i.toString()))                     
-                                             RESULT = i;
-                                        else 
-                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}  
+                      | Expr:e Point ident:i  {:System.out.println("Expr " + e.toString() +  ". ident " + i.toString());:}
                       | Expr LeftBrace Expr RightBrace;
 
 Call                ::= ident:i LeftParenthesis Actuals RightParenthesis{:RESULT = i;
