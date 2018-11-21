@@ -22,7 +22,6 @@ action code {:
         public Stack<String> scopes = new Stack<>();
 
         public String getType (Object obj){
-            Integer temp;
             if (obj instanceof Integer)
                 return "int";
             else if (obj instanceof Double)
@@ -31,9 +30,14 @@ action code {:
                 return "string";
             else if (obj instanceof Boolean)
                 return "bool";
+            else if(SearchSymbolTable(obj))
+                {
+                    ST tmp = ST.getSymbol(obj.toString(),checkScope());
+                    return tmp.Type;
+                }
             else 
                 return "n";
-            //temp = Integer.parseInt(String.valueOf(obj));
+            // Integer temp = Integer.parseInt(String.valueOf(obj));
             //System.out.println(" \\ 0.0/ " + obj);
         }
         public String checkScope(){
