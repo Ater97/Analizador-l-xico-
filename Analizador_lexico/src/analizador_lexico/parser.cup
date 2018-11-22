@@ -112,9 +112,9 @@ terminal Object     plus,Negation,mult,div,mod;
 
 terminal Object     EXCLA, Less, Greater;
 
-terminal String     ident, STRINGCONSTANT;
-terminal int        INTCONSTANT;
-terminal double     DOUBLECONSTANT;
+terminal Object     ident, STRINGCONSTANT;
+terminal Object        INTCONSTANT;
+terminal Object     DOUBLECONSTANT;
 
 non terminal Object Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
                     InterfaceDecl, Prototype, StmtBlock, Stmt, IfStmt, WhileStmt, ForStmt, ReturnStmt, 
@@ -150,7 +150,7 @@ Decl                ::= VariableDecl
                       | error RightBracket {: quitScope();:};
 
 VariableDecl        ::= Variable:v Semicolon {:RESULT = v;:};
-Variable            ::= Type:t ident:i {: if(!ST.Search(i,checkScope())){
+Variable            ::= Type:t ident:i {: if(!ST.Search(i.toString(),checkScope())){
                                             RESULT = t; 
                                             ST.Insert(i.toString(),checkScope(),t.toString(),null);}
                                             :};
@@ -161,13 +161,13 @@ Type                ::= INT     {: RESULT ="int";:}
                       | ident:i {: RESULT = i;:}
                       | Type:t LeftBracket RightBracket{: RESULT = t; quitScope();:}; 
 FunctionDecl        ::= Type:t ident:i {:   newScope(i.toString());
-                                            if(!ST.Search(i,checkScope())){
+                                            if(!ST.Search(i.toString(),checkScope())){
                                                 RESULT = i; 
                                                 ST.Insert(i.toString(),checkScope(),t.toString(),null);
                                             }
                                             :}LeftParenthesis Formals RightParenthesis StmtBlock 
                       | VOID:t ident:i {: newScope(i.toString());
-                                            if(!ST.Search(i,checkScope())){
+                                            if(!ST.Search(i.toString(),checkScope())){
                                             RESULT = t; 
                                             ST.Insert(i.toString(),checkScope(),"Void",null);}
                                             :}LeftParenthesis Formals RightParenthesis StmtBlock ;
@@ -177,13 +177,13 @@ Formals             ::= Variable:v FormalsA
 FormalsA            ::= Comma Variable:v FormalsA
                       |;
 
-ClassDecl           ::= CLASS ident:i {:newScope(i.toString());:}{: if(!ST.Search(i,checkScope())){
+ClassDecl           ::= CLASS ident:i {:newScope(i.toString());:}{: if(!ST.Search(i.toString(),checkScope())){
                                             ST.Insert(i.toString(),checkScope(),"Class",null);}
                                             :} ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket {: quitScope();:};
-ClassDeclA          ::= EXTENDS ident:i {: if(!ST.Search(i,checkScope())){
+ClassDeclA          ::= EXTENDS ident:i {: if(!ST.Search(i.toString(),checkScope())){
                                             ST.Insert(i.toString(),checkScope(),"Extends",null);}
                                             :}|;
-ClassDeclB          ::= IMPLEMENTS ident:i ClassDeclBb {: if(!ST.Search(i,checkScope())){ 
+ClassDeclB          ::= IMPLEMENTS ident:i ClassDeclBb {: if(!ST.Search(i.toString(),checkScope())){ 
                                             ST.Insert(i.toString(),checkScope(),"Implements",null);}
                                             :}|;
 ClassDeclBb         ::= Comma ident:i ClassDeclBb |;
@@ -227,8 +227,6 @@ PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
 Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
-                                                System.out.println(i);
-                                                System.out.println(e);
                                                 System.out.println("LValue Equal Expr:: " + i + " " + e);
                                         if(SearchSymbolTable(i.toString())){   
                                             ST tmp = ST.getSymbol(i.toString(),checkScope());
@@ -243,10 +241,23 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                             }:}
                       | Constant:c {:RESULT = c;:}
                       | Negation Expr
-                      | EXCLA Expr
-                      /*| Expr Negation Expr*/
-                      | Expr Less Expr  /*true false*/
-                      | Expr Greater Expr
+                      | EXCLA Expr      /*true false*/ {: :}
+                      | Expr:e1 Less Expr:e2  /*true false*/ {: if(SearchSymbolTable(e1.toString())){   
+                                                    ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    e1 = tmp.Value;
+                                                }
+                                                if(SearchSymbolTable(e2.toString())){   
+                                                    ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    e2 = tmp.Value;
+                                                } :}
+                      | Expr:e1 Greater Expr:e2 /*true false*/{: if(SearchSymbolTable(e1.toString())){   
+                                                    ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    e1 = tmp.Value;
+                                                }
+                                                if(SearchSymbolTable(e2.toString())){   
+                                                    ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    e2 = tmp.Value;
+                                                } :}
                       | LValue: i {:RESULT = i;:}
                       | THIS
                       | Call
