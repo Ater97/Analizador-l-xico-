@@ -27,6 +27,41 @@ action code {:
         public SymbolTable ST = new SymbolTable();
         public Stack<String> scopes = new Stack<>();
 
+
+       public ST getSymbolGlobal(String id)
+        {
+            if (scopes.empty() || scopes.size() <= 0||getStackElement(scopes,0)==null){
+                if(ST.Search(id,"Global")){
+                    System.out.println("Current Scope:: " + "Global");
+                    return ST.getSymbol(id,"Global");}
+                else {
+                    return null;}
+            }
+            for (int i = scopes.size(); i > 0; --i) {
+                System.out.println("Current Scope: " + getStackElement(scopes,i));
+                if(ST.Search(id,getStackElement(scopes,i)))
+                    return ST.getSymbol(id,getStackElement(scopes,i));
+            }
+            return null;
+        }
+        public Boolean SearchSymbolTable(String id)
+        {
+            System.out.println("SearchSymbolTable:: " + id);
+            if (scopes.empty() || scopes.size() <= 0||getStackElement(scopes,0)==null){
+                if(ST.Search(id,"Global")){
+                    System.out.println("Current Scope:: " + "Global");
+                    return true;}
+                else {
+                    return false;}
+            }
+            for (int i = scopes.size(); i > 0; --i) {
+                System.out.println("Current Scope:: " + getStackElement(scopes,i));
+                if(ST.Search(id,getStackElement(scopes,i)))
+                    return true;
+            }
+            System.out.println("*ERROR the symbol isnt in the Symbol table "+ id);
+            return false;
+        }
         public String getType (Object obj){
             if (obj instanceof Integer)
                 return "int";
@@ -49,39 +84,24 @@ action code {:
             //System.out.println(" \\ 0.0/ " + obj);
         }
         public String checkScope(){
-            if (scopes.empty())
+            if (scopes.empty()||getStackElement(scopes,0)==null)
                 return "Global";
             return scopes.peek();
         }
         public void newScope(String ambito)
         {
             if(ST.Search(ambito,checkScope()))
-                    System.out.println("*Error two scopes with the same name" +ambito +checkScope() );
-            else
+                    System.out.println("*Error two scopes with the same name " + checkScope()+"."+ambito );
+            else{
             System.out.println("New Scope:: " + ambito);
             scopes.push(ambito);
+            }
         }
         public void quitScope(){
             if (!scopes.empty())
                     scopes.pop();
         }
-        public Boolean SearchSymbolTable(String id)
-        {
-            System.out.println("SearchSymbolTable:: " + id);
-            if (scopes.empty() || scopes.size() <= 0){
-                if(ST.Search(id,"Global")){
-                    return true;}
-                else {
-                    return false;}
-            }
-            for (int i = scopes.size(); i > 0; --i) {
-                System.out.println("Current Scope: " + getStackElement(scopes,i));
-                if(ST.Search(id,getStackElement(scopes,i)))
-                    return true;
-            }
-            System.out.println("*ERROR the symbol isnt in the Symbol table "+ id);
-            return false;
-        }
+        
 
         public static <T> T getStackElement(Stack<T> stack, int index) {
             if(!stack.empty())
@@ -150,7 +170,9 @@ Decl                ::= VariableDecl
                       | error RightBracket {: quitScope();:};
 
 VariableDecl        ::= Variable:v Semicolon {:RESULT = v;:};
-Variable            ::= Type:t ident:i {: if(!ST.Search(i.toString(),checkScope())){
+Variable            ::= Type:t ident:i {: 
+                                            System.out.println("Variable :: " + checkScope() + "." + i.toString());
+                                            if(!ST.Search(i.toString(),checkScope())){
                                             RESULT = t; 
                                             ST.Insert(i.toString(),checkScope(),t.toString(),null);}
                                             :};
@@ -159,17 +181,19 @@ Type                ::= INT     {: RESULT ="int";:}
                       | BOOL    {: RESULT ="bool";:}
                       | STRING  {: RESULT ="string";:}
                       | ident:i {: RESULT = i;:}
-                      | Type:t LeftBracket RightBracket{: RESULT = t; quitScope();:}; 
-FunctionDecl        ::= Type:t ident:i {:   newScope(i.toString());
+                      | Type:t {:RESULT = t;:}LeftBracket RightBracket{: quitScope();:}; 
+FunctionDecl        ::= Type:t ident:i {:   
                                             if(!ST.Search(i.toString(),checkScope())){
                                                 RESULT = i; 
                                                 ST.Insert(i.toString(),checkScope(),t.toString(),null);
                                             }
+                                            newScope(i.toString());
                                             :}LeftParenthesis Formals RightParenthesis StmtBlock 
-                      | VOID:t ident:i {: newScope(i.toString());
+                      | VOID:t ident:i {: 
                                             if(!ST.Search(i.toString(),checkScope())){
-                                            RESULT = t; 
-                                            ST.Insert(i.toString(),checkScope(),"Void",null);}
+                                                RESULT = t; 
+                                                ST.Insert(i.toString(),checkScope(),"Void",null);}
+                                            newScope(i.toString());
                                             :}LeftParenthesis Formals RightParenthesis StmtBlock ;
 
 Formals             ::= Variable:v FormalsA
@@ -177,8 +201,9 @@ Formals             ::= Variable:v FormalsA
 FormalsA            ::= Comma Variable:v FormalsA
                       |;
 
-ClassDecl           ::= CLASS ident:i {:newScope(i.toString());:}{: if(!ST.Search(i.toString(),checkScope())){
-                                            ST.Insert(i.toString(),checkScope(),"Class",null);}
+ClassDecl           ::= CLASS ident:i {:    if(!ST.Search(i.toString(),checkScope())){
+                                                ST.Insert(i.toString(),checkScope(),"Class",null);}
+                                            newScope(i.toString());    
                                             :} ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket {: quitScope();:};
 ClassDeclA          ::= EXTENDS ident:i {: if(!ST.Search(i.toString(),checkScope())){
                                             ST.Insert(i.toString(),checkScope(),"Extends",null);}
@@ -227,11 +252,11 @@ PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
 Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
-                                                System.out.println("LValue Equal Expr:: " + i + " " + e);
+                                                System.out.println("Expr = LValue Equal Expr:: " + i + " " + e);
                                         if(SearchSymbolTable(i.toString())){   
-                                            ST tmp = ST.getSymbol(i.toString(),checkScope());
+                                            ST tmp = getSymbolGlobal(i.toString());
                                             getType(e);
-                                            System.out.println("Tipo LValue:: "+ i.toString() +" "+ tmp.Type +" Tipo Expr:: " + e.toString() + " " + getType(e));
+                                            System.out.println("Tipo LValue:: "+ tmp.Name +" "+ tmp.Type +" Tipo Expr:: " + e.toString() + " " + getType(e));
                                             if(getType(e).equals(tmp.Type)){                  
                                                 RESULT = e;
                                                 ST.update(i.toString(),checkScope(),e.toString());
@@ -243,19 +268,19 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                       | Negation Expr
                       | EXCLA Expr      /*true false*/ {: :}
                       | Expr:e1 Less Expr:e2  /*true false*/ {: if(SearchSymbolTable(e1.toString())){   
-                                                    ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e1.toString());
                                                     e1 = tmp.Value;
                                                 }
                                                 if(SearchSymbolTable(e2.toString())){   
-                                                    ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e2.toString());
                                                     e2 = tmp.Value;
                                                 } :}
                       | Expr:e1 Greater Expr:e2 /*true false*/{: if(SearchSymbolTable(e1.toString())){   
-                                                    ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e1.toString());
                                                     e1 = tmp.Value;
                                                 }
                                                 if(SearchSymbolTable(e2.toString())){   
-                                                    ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e2.toString());
                                                     e2 = tmp.Value;
                                                 } :}
                       | LValue: i {:RESULT = i;:}
@@ -264,11 +289,13 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                       | LeftParenthesis Expr RightParenthesis 
                       | Expr:e1 plus Expr:e2    {:
                                                 if(SearchSymbolTable(e1.toString())){   
-                                                    ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    //ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e1.toString());
                                                     e1 = tmp.Value;
                                                 }
                                                 if(SearchSymbolTable(e2.toString())){   
-                                                    ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    //ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e2.toString());
                                                     e2 = tmp.Value;
                                                 }
                                                 if(getType(e1).equals(getType(e2)))
@@ -282,23 +309,23 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                         RESULT = e1;
                                                     }
                                                 }
-                                                
 
                                                 if((getType(e1).equals("string")) && (getType(e2).equals("string"))){
                                                     RESULT = (Object)(e1.toString() + e2.toString());}
-                                                else if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
 
+                                                else if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
                                                     System.out.println("plus::" + e1.toString() + " " + e2.toString());
                                                     RESULT = (Object)((Integer.parseInt(String.valueOf(e1))) + ((Integer.parseInt(String.valueOf(e2)))));}
+
                                                 else if ((getType(e1).equals("double")) && (getType(e2).equals("double"))) {
                                                     RESULT = (Object)(((Double)e1) + ((Double)e2));}
                                                 else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                     RESULT = (Object)(((Double)e1) + ((Double)e2));}
                                                 else{
-                                                    RESULT = null;
-                                                    System.out.println("UNKONW types " + e1 + " " + e2);
-                                                if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                    System.out.println("ERROR wrong types " + e1.toString() + " " + e2.toString());
+                                                        
+                                                        System.out.println("UNKONW types " + e1 + " " + e2);
+                                                    if ((getType(e1) != "n") && (getType(e2) != "n")){
+                                                        System.out.println("ERROR wrong types " + e1.toString() + " " + e2.toString());
                                                 }
                                                 }:}
                       | Expr:e1 Negation Expr:e2 {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
@@ -306,7 +333,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 }else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                     RESULT = ((Double)e1) - ((Double)e2);
                                                 }else{
-                                                    RESULT = null;
+                                                    //RESULT = null;
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                     System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
@@ -316,7 +343,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 }else if (((getType(e1).equals("int"))||(getType(e1).equals("double")) && ((getType(e2).equals("int"))||(getType(e2).equals("double"))))) {
                                                     RESULT = ((Double)e1) * ((Double)e2);
                                                 }else{
-                                                    RESULT = null;
+                                                    //RESULT = null;
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                     System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
@@ -326,7 +353,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 }else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                     RESULT = ((Double)e1) / ((Double)e2);
                                                 }else{
-                                                    RESULT = null;
+                                                    //RESULT = null;
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                     System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
@@ -336,7 +363,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 }else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                     RESULT = ((Double)e1) % ((Double)e2);
                                                 }else{
-                                                    RESULT = null;
+                                                    //RESULT = null;
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                     System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
@@ -382,4 +409,4 @@ Constant            ::= INTCONSTANT:v       {:System.out.println(" \\ INTCONSTAN
                       | DOUBLECONSTANT:v    {:System.out.println(" \\ DOUBLECONSTANT / "+v); RESULT = v;:}
                       | BOOLCONSTANT:v      {:System.out.println(" \\ BOOLCONSTANT / "+v); RESULT = v;:}
                       | STRINGCONSTANT:v    {:System.out.println(" \\ STRINGCONSTANT / "+v); RESULT = v;:}
-                      | NULL;
+                      | NULL:v              {:System.out.println(" \\ NULLCONS / "+v); RESULT = v;:};               
