@@ -31,6 +31,7 @@ public class Analizador_lexico {
      * @throws java.io.IOException
      */
     public static String staticPath = "";
+    public static SymbolTable STm = new SymbolTable();
     public static void main(String[] args) throws IOException, Exception {
 
         String path = new File(".").getCanonicalPath();

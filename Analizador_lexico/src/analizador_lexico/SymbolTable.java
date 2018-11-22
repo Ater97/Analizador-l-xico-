@@ -57,7 +57,11 @@ public class SymbolTable {
         temp.Value = value;
         SymbolHashtable.put(name + ambito, temp);
     }
- 
+    
+    public void PrintE() throws IOException
+    {
+        Analizador_lexico.STm.DictionaryToPrint();
+    }
     public String DictionaryToString()
     {
         String temp = "Name Scope Type Value\n-----------------------------------------------\n";
