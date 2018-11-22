@@ -1,5 +1,4 @@
 package analizador_lexico;
-/*import java.util.ArrayList;*/
 import java.util.*;
 import java_cup.runtime.*;
 
@@ -10,7 +9,6 @@ parser code  {:
    public void syntax_error(Symbol cur_token) {  
         ErrorNumber++;
         ErrorM += ErrorNumber + " Sintac Message Line: " + (cur_token.left+1) + " Col: " +(cur_token.right+1) + " Text: " + cur_token.value+"\n";
-    //    report_error("Error de sintaxis. Columna: " + (cur_token.right + 1) + " Linea: " + (cur_token.left+1) + ". Texto: \"" + cur_token.value + "\"", null);
    }
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
     {
@@ -25,14 +23,16 @@ action code {:
                 return "int";
             else if (obj instanceof Double)
                 return "double";
-            else if (obj instanceof String)
-                return "string";
             else if (obj instanceof Boolean)
                 return "bool";
-            else if(SearchSymbolTable(obj.toString()))
+            else if (obj instanceof String)
                 {
-                    ST tmp = ST.getSymbol(obj.toString(),checkScope());
-                    return tmp.Type;
+                    if(SearchSymbolTable(obj.toString()))
+                    {
+                        ST tmp = ST.getSymbol(obj.toString(),checkScope());
+                        return tmp.Type;
+                    }
+                    return "string";
                 }
             else 
                 return "n";
@@ -47,7 +47,7 @@ action code {:
         public void newScope(String ambito)
         {
             if(ST.Search(ambito,checkScope()))
-                    System.out.println("Error two scopes with the same name" +ambito +checkScope() );
+                    System.out.println("*Error two scopes with the same name" +ambito +checkScope() );
             else
             scopes.push(ambito);
         }
@@ -57,14 +57,14 @@ action code {:
         }
         public Boolean SearchSymbolTable(String id)
         {
-            System.out.println("Search id " + id);
+            System.out.println("SearchSymbolTable:: " + id);
             if (scopes.empty())
                 if(ST.Search(id,"Global")){
                     return true;}
                 else {
                     return false;}
             for (int i = scopes.size(); i > 0; --i) {
-                System.out.println("Current Scope: " + getStackElement(scopes,i));
+                //System.out.println("Current Scope: " + getStackElement(scopes,i));
                 if(ST.Search(id,getStackElement(scopes,i)))
                     return true;
             }
@@ -118,8 +118,8 @@ precedence left     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
 precedence left     Semicolon;
 
-precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    /*Arithmetic_Op,*/ Equal,Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+precedence left     Equal, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
+                    /*Arithmetic_Op,*/ Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
  
 precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, Negation, Less, Greater;
 
@@ -214,38 +214,48 @@ PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                         if(SearchSymbolTable(i.toString())){   
                                             ST tmp = ST.getSymbol(i.toString(),checkScope());
-                                            System.out.println("Test " + getType(e));
-                                            System.out.println("Tipo LValue "+ i.toString() +" "+ tmp.Type +" Tipo Expr " + getType(e));
+                                            System.out.println("Test " + e.toString());
+                                            System.out.println("Tipo LValue:: "+ i.toString() +" "+ tmp.Type +" Tipo Expr:: " + e.toString() + " " + getType(e));
                                             if(getType(e).equals(tmp.Type)){                  
                                                 RESULT = e;}
                                             else{ 
-                                            System.out.println("ERROR wrong types" + i.toString() + " " + e.toString());}
+                                            System.out.println("*ERROR wrong types " + i.toString() + " " + e.toString());}
                                             }
                                         else {
-                                        System.out.println("ERROR the symbol isnt in the Symbol table");}:}
+                                        System.out.println("*ERROR the symbol isnt in the Symbol table "+i.toString());}:}
                       | Constant:c {:RESULT = c;:}
                       | Negation Expr
                       | EXCLA Expr
                       /*| Expr Negation Expr*/
-                      | Expr Less Expr
+                      | Expr Less Expr  /*true false*/
                       | Expr Greater Expr
                       | LValue: i {:RESULT = i;:}
                       | THIS
                       | Call
                       | LeftParenthesis Expr RightParenthesis 
-                      | Expr:e1 plus Expr:e2    {:if((getType(e1).equals("string")) && (getType(e2).equals("string"))){
-                                                RESULT = e1.toString() + e2.toString();}
+                      | Expr:e1 plus Expr:e2    {:
+                                                if(SearchSymbolTable(e1.toString())){   
+                                                    ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    e1 = tmp.Value;
+                                                }
+                                                if(SearchSymbolTable(e2.toString())){   
+                                                    ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    e2 = tmp.Value;
+                                                }
+                                                if((getType(e1).equals("string")) && (getType(e2).equals("string"))){
+                                                    RESULT = (Object)(e1.toString() + e2.toString());}
                                                 else if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
-                                                RESULT = ((Integer)e1) + ((Integer)e2);}
+                                                    System.out.println("plus::" + e1.toString() + " " + e2.toString());
+                                                    RESULT = (Object)((Integer.parseInt(String.valueOf(e1))) + ((Integer.parseInt(String.valueOf(e2)))));}
                                                 else if ((getType(e1).equals("double")) && (getType(e2).equals("double"))) {
-                                                RESULT = ((Integer)e1) + ((Integer)e2);}
+                                                    RESULT = (Object)(((Double)e1) + ((Double)e2));}
                                                 else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
-                                                RESULT = ((Double)e1) + ((Double)e2);}
+                                                    RESULT = (Object)(((Double)e1) + ((Double)e2));}
                                                 else{
-                                                RESULT = null;
-                                                System.out.println("UNKONW types" + e1 + " " + e2);
+                                                    RESULT = null;
+                                                    System.out.println("UNKONW types" + e1 + " " + e2);
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                    System.out.println("ERROR wrong types" + e1 + " " + e2);
+                                                    System.out.println("ERROR wrong types " + e1.toString() + " " + e2.toString());
                                                 }
                                                 }:}
                       | Expr:e1 Negation Expr:e2 {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
@@ -255,7 +265,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 }else{
                                                 RESULT = null;
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                System.out.println("ERROR wrong types"+ e1 + " " + e2);
+                                                System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
                                                 }:}
                       | Expr:e1 mult Expr:e2    {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
@@ -265,7 +275,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 }else{
                                                 RESULT = null;
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                System.out.println("ERROR wrong types"+ e1 + " " + e2);
+                                                System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
                                                 }:}
                       | Expr:e1 div Expr:e2     {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
@@ -275,7 +285,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 }else{
                                                 RESULT = null;
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                System.out.println("ERROR wrong types"+ e1 + " " + e2);
+                                                System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
                                                 }:}
                       | Expr:e1 mod Expr:e2 }   {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
@@ -285,7 +295,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 }else{
                                                 RESULT = null;
                                                 if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                System.out.println("ERROR wrong types"+ e1 + " " + e2);
+                                                System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
                                                 }:}
                       | Expr Comparison_op Expr
@@ -294,18 +304,19 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                         if(SearchSymbolTable(i.toString()))                     
                                              RESULT = i;
                                         else 
-                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
+                                        System.out.println("*ERROR the symbol isnt in the Symbol table "+i.toString());:}
                       | NEWARRAY LeftParenthesis Expr Comma Type RightParenthesis
                       | READINTEGER LeftParenthesis RightParenthesis
                       | READLINE LeftParenthesis RightParenthesis
                       | MALLOC LeftParenthesis Expr RightParenthesis;
 
 LValue              ::= ident:i     {:RESULT = i;
-                                            System.out.println("LValue " + i.toString());
+                                            System.out.println("LValue:: " + i.toString());
                                         if(SearchSymbolTable(i.toString()))                     
                                              RESULT = i;
+                                             
                                         else 
-                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
+                                        System.out.println("*ERROR the symbol isnt in the Symbol table "+i.toString());:}
                       | Expr:e Point ident:i  {:System.out.println("Expr " + e.toString() +  ". ident " + i.toString());:}
                       | Expr LeftBrace Expr RightBrace;
 
@@ -313,12 +324,12 @@ Call                ::= ident:i LeftParenthesis Actuals RightParenthesis{:RESULT
                                         if(SearchSymbolTable(i.toString()))                     
                                              RESULT = i;
                                         else 
-                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
-                      | Expr Point ident:i LeftParenthesis Actuals RightParenthesis{:RESULT = i;
+                                        System.out.println("*ERROR the symbol isnt in the Symbol table "+i.toString());:}
+                      | Expr:i Point ident LeftParenthesis Actuals RightParenthesis{:RESULT = i;
                                         if(SearchSymbolTable(i.toString()))                     
                                              RESULT = i;
                                         else 
-                                        System.out.println("ERROR the symbol isnt in the Symbol table");:}
+                                        System.out.println("*ERROR the symbol isnt in the Symbol table "+i.toString());:}
                       | Expr Point LibCall LeftParenthesis Actuals RightParenthesis;
 
 LibCall             ::= GETBYTE LeftParenthesis Expr RightParenthesis

@@ -35,7 +35,7 @@ public class SymbolTable {
         {
             //dictionary.put(name + ambito, name + ambito + type + value);
             SymbolHashtable.put(name + ambito, new ST(name,ambito,type,value));
-            System.out.println("Successful Insert " +name + " " + ambito);
+            System.out.println("Successful Insert:: " +ambito + "." + name +" Type::" + type);
         }   
     }
     
@@ -60,7 +60,7 @@ public class SymbolTable {
  
     public String DictionaryToString()
     {
-        String temp = "Name Scope Type Value\n";
+        String temp = "Name Scope Type Value\n-----------------------------------------------\n";
         ArrayList<ST> aux = new ArrayList<>();
         aux.addAll(SymbolHashtable.values());
         for (int i = 0; i < aux.size(); i++) {
@@ -80,7 +80,6 @@ public class SymbolTable {
 
     public static void CreateFile(String filename, String path, String MainList) throws IOException
     {
-        
         path = path.replace(filename, "");
         filename = filename.replace(".frag", "");  
         filename = filename.replace(".txt", ""); 
@@ -88,11 +87,6 @@ public class SymbolTable {
 	FileOutputStream fos = new FileOutputStream(fout);
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos))) {
             bw.write(MainList);
-            /*for (int i = 0; i < MainList.size(); i++) {
-                if(!MainList.get(i).equals("\r") && !MainList.get(i).isEmpty() && !MainList.get(i).equals("") && !MainList.get(i).equals("\n")){
-                    bw.write(MainList.get(i));
-                    bw.newLine();}
-            }*/
         }
     }
 }
