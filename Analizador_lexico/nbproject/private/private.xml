@@ -3,7 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/GitHub/Analizador-lexico/Analizador_lexico/nbproject/build-impl.xml</file>
+            <file>file:/D:/GitHub/Analizador-lexico/Analizador_lexico/src/analizador_lexico/Parser.java</file>
+            <file>file:/D:/GitHub/Analizador-lexico/Analizador_lexico/src/analizador_lexico/ST.java</file>
             <file>file:/D:/GitHub/Analizador-lexico/Analizador_lexico/src/analizador_lexico/SymbolTable.java</file>
             <file>file:/D:/GitHub/Analizador-lexico/Analizador_lexico/src/analizador_lexico/Analizador_lexico.java</file>
         </group>

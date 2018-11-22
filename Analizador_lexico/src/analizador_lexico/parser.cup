@@ -15,7 +15,6 @@ parser code  {:
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception 
     {
     }
-       
 :};
 action code {:
         public SymbolTable ST = new SymbolTable();
@@ -216,7 +215,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                         if(SearchSymbolTable(i.toString())){   
                                             ST tmp = ST.getSymbol(i.toString(),checkScope());
                                             System.out.println("Tipo LValue "+ i.toString() +" "+ tmp.Type +" Tipo Expr " + getType(e));
-                                            if(getType(e) == tmp.Type){                  
+                                            if(getType(e).equals(tmp.Type)){                  
                                                 RESULT = e;}
                                             else{ 
                                             System.out.println("ERROR wrong types" + i.toString() + " " + e.toString());}
@@ -233,13 +232,13 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                       | THIS
                       | Call
                       | LeftParenthesis Expr RightParenthesis 
-                      | Expr:e1 plus Expr:e2    {:if((getType(e1) == "string") && (getType(e2) == "string")){
+                      | Expr:e1 plus Expr:e2    {:if((getType(e1).equals("string")) && (getType(e2).equals("string"))){
                                                 RESULT = e1.toString() + e2.toString();}
-                                                else if ((getType(e1) == "int") && (getType(e2) == "int")) {
+                                                else if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
                                                 RESULT = ((Integer)e1) + ((Integer)e2);}
-                                                else if ((getType(e1) == "double") && (getType(e2) == "double")) {
+                                                else if ((getType(e1).equals("double")) && (getType(e2).equals("double"))) {
                                                 RESULT = ((Integer)e1) + ((Integer)e2);}
-                                                else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
+                                                else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                 RESULT = ((Double)e1) + ((Double)e2);}
                                                 else{
                                                 RESULT = null;
@@ -248,9 +247,9 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                     System.out.println("ERROR wrong types" + e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr:e1 Negation Expr:e2 {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
+                      | Expr:e1 Negation Expr:e2 {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
                                                 RESULT = ((Integer)e1) - ((Integer)e2);
-                                                }else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
+                                                }else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                 RESULT = ((Double)e1) - ((Double)e2);
                                                 }else{
                                                 RESULT = null;
@@ -258,9 +257,9 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 System.out.println("ERROR wrong types"+ e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr:e1 mult Expr:e2    {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
+                      | Expr:e1 mult Expr:e2    {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
                                                 RESULT = ((Integer)e1) * ((Integer)e2);
-                                                }else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
+                                                }else if (((getType(e1).equals("int"))||(getType(e1).equals("double")) && ((getType(e2).equals("int"))||(getType(e2).equals("double"))))) {
                                                 RESULT = ((Double)e1) * ((Double)e2);
                                                 }else{
                                                 RESULT = null;
@@ -268,9 +267,9 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 System.out.println("ERROR wrong types"+ e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr:e1 div Expr:e2     {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
+                      | Expr:e1 div Expr:e2     {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
                                                 RESULT = ((Integer)e1) / ((Integer)e2);
-                                                }else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
+                                                }else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                 RESULT = ((Double)e1) / ((Double)e2);
                                                 }else{
                                                 RESULT = null;
@@ -278,9 +277,9 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 System.out.println("ERROR wrong types"+ e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr:e1 mod Expr:e2 }   {:if ((getType(e1) == "int") && (getType(e2) == "int")) {
+                      | Expr:e1 mod Expr:e2 }   {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
                                                 RESULT = ((Integer)e1) % ((Integer)e2);
-                                                }else if (((getType(e1) == "int")||(getType(e1) == "double")) && ((getType(e2) == "int")||(getType(e2) == "double"))) {
+                                                }else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                 RESULT = ((Double)e1) % ((Double)e2);
                                                 }else{
                                                 RESULT = null;

@@ -68,7 +68,6 @@ public class Analizador_lexico {
                         "\nLength: " + lexer.errornumberLength + 
                         "\nTotal : " + (P.ErrorNumber + lexer.errornumber + lexer.errornumberLength));
         }
-        
     }
     public static void GenerateLexerFile(String path)
     {
