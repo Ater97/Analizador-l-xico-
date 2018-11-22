@@ -63,9 +63,10 @@ action code {:
             return false;
         }
         public String getType (Object obj){
-            if (obj instanceof Integer)
+
+            if (obj instanceof Integer||isInteger(obj.toString()))
                 return "int";
-            else if (obj instanceof Double)
+            else if (obj instanceof Double||isDouble(obj.toString()))
                 return "double";
             else if (obj instanceof Boolean)
                 return "bool";
@@ -83,6 +84,23 @@ action code {:
             // Integer temp = Integer.parseInt(String.valueOf(obj));
             //System.out.println(" \\ 0.0/ " + obj);
         }
+        public boolean isDouble(String str) {
+            try {
+                Double.parseDouble(str);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        public boolean isInteger(String str) {
+            try {
+               Integer.parseInt(str);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
         public String checkScope(){
             if (scopes.empty()||getStackElement(scopes,0)==null)
                 return "Global";
@@ -145,12 +163,12 @@ non terminal Object ProgramA, FormalsA, ClassDeclC, ClassDeclBb, ClassDeclB, Cla
 
 
    
-precedence left     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
+precedence left     Equal, INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS, INTERFACE, IF,
                     ELSE, WHILE, FOR, RETURN, BREAK, PRINT, THIS, NEW, NEWARRAY, READINTEGER,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE;
 precedence left     Semicolon;
 
-precedence left     Equal, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
+precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
                     /*Arithmetic_Op,*/ Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
  
 precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, Negation, Less, Greater;
@@ -188,23 +206,26 @@ FunctionDecl        ::= Type:t ident:i {:
                                                 ST.Insert(i.toString(),checkScope(),t.toString(),null);
                                             }
                                             newScope(i.toString());
-                                            :}LeftParenthesis Formals RightParenthesis StmtBlock 
+                                            :}
+                        LeftParenthesis Formals RightParenthesis StmtBlock 
                       | VOID:t ident:i {: 
                                             if(!ST.Search(i.toString(),checkScope())){
                                                 RESULT = t; 
                                                 ST.Insert(i.toString(),checkScope(),"Void",null);}
                                             newScope(i.toString());
-                                            :}LeftParenthesis Formals RightParenthesis StmtBlock ;
+                                            :}
+                        LeftParenthesis Formals RightParenthesis StmtBlock ;
 
-Formals             ::= Variable:v FormalsA
+Formals             ::= Variable:v FormalsA {:RESULT =v;:}
                       |;
-FormalsA            ::= Comma Variable:v FormalsA
+FormalsA            ::= Comma Variable:v {:RESULT =v;:} FormalsA
                       |;
 
 ClassDecl           ::= CLASS ident:i {:    if(!ST.Search(i.toString(),checkScope())){
                                                 ST.Insert(i.toString(),checkScope(),"Class",null);}
                                             newScope(i.toString());    
-                                            :} ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket {: quitScope();:};
+                                            :} 
+                        ClassDeclA ClassDeclB LeftBracket ClassDeclC RightBracket {: quitScope();:};
 ClassDeclA          ::= EXTENDS ident:i {: if(!ST.Search(i.toString(),checkScope())){
                                             ST.Insert(i.toString(),checkScope(),"Extends",null);}
                                             :}|;
@@ -220,8 +241,8 @@ Field               ::= VariableDecl
 InterfaceDecl       ::= INTERFACE ident:i {:newScope(i.toString());:} LeftBracket InterfaceDeclA RightBracket{: quitScope();:};
 InterfaceDeclA      ::= Prototype InterfaceDeclA |;
 
-Prototype           ::= Type ident:i {:newScope(i.toString());:} LeftParenthesis Formals RightParenthesis Semicolon
-                      | VOID ident:i {:newScope(i.toString());:}  LeftParenthesis Formals RightParenthesis Semicolon;
+Prototype           ::= Type ident:i  LeftParenthesis Formals RightParenthesis Semicolon
+                      | VOID ident:i    LeftParenthesis Formals RightParenthesis Semicolon;
 
 StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket {: quitScope();:};
 StmtBlockA          ::= StmtBlockA  VariableDecl|;
@@ -237,7 +258,7 @@ Stmt                ::= Expr:e Semicolon {:RESULT = e;:}
                       | PrintStmt
                       | StmtBlock;
 IfStmt              ::= IF LeftParenthesis Expr RightParenthesis Stmt IfStmtA;
-IfStmtA             ::= ELSE Stmt | ;
+IfStmtA             ::= ELSE Stmt:s {:RESULT =s;:}| ;
 
 WhileStmt           ::= WHILE LeftParenthesis Expr RightParenthesis Stmt;
 
@@ -252,36 +273,44 @@ PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
 Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
-                                                System.out.println("Expr = LValue Equal Expr:: " + i + " " + e);
-                                        if(SearchSymbolTable(i.toString())){   
-                                            ST tmp = getSymbolGlobal(i.toString());
-                                            getType(e);
-                                            System.out.println("Tipo LValue:: "+ tmp.Name +" "+ tmp.Type +" Tipo Expr:: " + e.toString() + " " + getType(e));
-                                            if(getType(e).equals(tmp.Type)){                  
-                                                RESULT = e;
-                                                ST.update(i.toString(),checkScope(),e.toString());
-                                            }
-                                            else{ 
-                                                System.out.println("*ERROR wrong types " + i.toString() + " " + e.toString());}
+                                            System.out.println("Expr = LValue Equal Expr:: " + i + " " + e);
+                                            if(SearchSymbolTable(i.toString())){   
+                                                ST tmp = getSymbolGlobal(i.toString());
+                                                    if(SearchSymbolTable(e.toString())){
+                                                        ST tmp2 = getSymbolGlobal(e.toString());
+                                                        e = (Object)tmp2.Value;
+                                                    }
+                                                //System.out.println("Tipo LValue:: "+ tmp.Name +" "+ tmp.Type +" Tipo Expr:: " + e.toString() + " " + getType(e));
+                                                if(getType(e).equals(tmp.Type)){                  
+                                                    RESULT = e;
+                                                    ST.update(i.toString(),checkScope(),e.toString());
+                                                }
+                                                else{ 
+                                                    System.out.println("*ERROR wrong types " + i.toString() + " " + e.toString());
+                                                    System.out.println("*ERROR wrong types " + getType(i) + " " + getType(e));}
                                             }:}
+
                       | Constant:c {:RESULT = c;:}
                       | Negation Expr
                       | EXCLA Expr      /*true false*/ {: :}
                       | Expr:e1 Less Expr:e2  /*true false*/ {: if(SearchSymbolTable(e1.toString())){   
                                                     ST tmp = getSymbolGlobal(e1.toString());
-                                                    e1 = tmp.Value;
+                                                    e1 = (Object)tmp.Value;
                                                 }
                                                 if(SearchSymbolTable(e2.toString())){   
                                                     ST tmp = getSymbolGlobal(e2.toString());
-                                                    e2 = tmp.Value;
-                                                } :}
+                                                    e2 = (Object)tmp.Value;
+                                                } 
+                                                
+
+                                                :}
                       | Expr:e1 Greater Expr:e2 /*true false*/{: if(SearchSymbolTable(e1.toString())){   
                                                     ST tmp = getSymbolGlobal(e1.toString());
-                                                    e1 = tmp.Value;
+                                                    e1 = (Object)tmp.Value;
                                                 }
                                                 if(SearchSymbolTable(e2.toString())){   
                                                     ST tmp = getSymbolGlobal(e2.toString());
-                                                    e2 = tmp.Value;
+                                                    e2 = (Object)tmp.Value;
                                                 } :}
                       | LValue: i {:RESULT = i;:}
                       | THIS
@@ -291,30 +320,33 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                 if(SearchSymbolTable(e1.toString())){   
                                                     //ST tmp = ST.getSymbol(e1.toString(),checkScope());
                                                     ST tmp = getSymbolGlobal(e1.toString());
-                                                    e1 = tmp.Value;
+                                                    System.out.println("e1 Name:: " + e1.toString());
+                                                    e1 = (Object)tmp.Value;
+                                                    System.out.println("e1 Value:: " + e1.toString());
                                                 }
                                                 if(SearchSymbolTable(e2.toString())){   
                                                     //ST tmp = ST.getSymbol(e2.toString(),checkScope());
                                                     ST tmp = getSymbolGlobal(e2.toString());
-                                                    e2 = tmp.Value;
+                                                     System.out.println("e2 Name:: " + e2.toString());
+                                                    e2 = (Object)tmp.Value;
+                                                    System.out.println("e2 Value:: " + e2.toString());
                                                 }
                                                 if(getType(e1).equals(getType(e2)))
-                                                {
+                                                { 
                                                     if(e1 == null)
                                                     {
-                                                        RESULT = e2;
-                                                    }
+                                                        RESULT = e2;}
                                                     if(e2 == null)
                                                     {
-                                                        RESULT = e1;
-                                                    }
+                                                        RESULT = e1;}
                                                 }
-
+                                                //System.out.println("plus::" + e1.toString() + " " + e2.toString());
+                                                System.out.println("plus::" + getType(e1) + " " + getType(e2));
                                                 if((getType(e1).equals("string")) && (getType(e2).equals("string"))){
                                                     RESULT = (Object)(e1.toString() + e2.toString());}
 
                                                 else if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
-                                                    System.out.println("plus::" + e1.toString() + " " + e2.toString());
+                                                   
                                                     RESULT = (Object)((Integer.parseInt(String.valueOf(e1))) + ((Integer.parseInt(String.valueOf(e2)))));}
 
                                                 else if ((getType(e1).equals("double")) && (getType(e2).equals("double"))) {
@@ -326,6 +358,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                         System.out.println("UNKONW types " + e1 + " " + e2);
                                                     if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                         System.out.println("ERROR wrong types " + e1.toString() + " " + e2.toString());
+                                                        System.out.println("*ERROR wrong types " + getType(e1) + " " + getType(e2));
                                                 }
                                                 }:}
                       | Expr:e1 Negation Expr:e2 {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
@@ -384,7 +417,8 @@ LValue              ::= ident:i     {:RESULT = i;
                                         if(SearchSymbolTable(i.toString()))                     
                                              RESULT = i;
                                     :}
-                      | Expr:e Point ident:i  {:System.out.println("Expr " + e.toString() +  ". ident " + i.toString());:}
+                      | Expr:e Point ident:i  {:RESULT = i;
+                                                System.out.println("Expr " + e.toString() +  ". ident " + i.toString());:}
                       | Expr LeftBrace Expr RightBrace;
 
 Call                ::= ident:i LeftParenthesis Actuals RightParenthesis{:RESULT = i;
@@ -409,4 +443,4 @@ Constant            ::= INTCONSTANT:v       {:System.out.println(" \\ INTCONSTAN
                       | DOUBLECONSTANT:v    {:System.out.println(" \\ DOUBLECONSTANT / "+v); RESULT = v;:}
                       | BOOLCONSTANT:v      {:System.out.println(" \\ BOOLCONSTANT / "+v); RESULT = v;:}
                       | STRINGCONSTANT:v    {:System.out.println(" \\ STRINGCONSTANT / "+v); RESULT = v;:}
-                      | NULL:v              {:System.out.println(" \\ NULLCONS / "+v); RESULT = v;:};               
+                      | NULL:v              {:System.out.println(" \\ NULL / "+v); RESULT = v;:};               

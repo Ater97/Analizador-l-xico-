@@ -21,5 +21,19 @@ public class ST {
         Type = type;
         Value = value;
         Scope = scope;
+        setValueDefault();
     }       
+    
+    public void setValueDefault()
+    {
+        if(Value==null)
+        {
+            if(Type.equals("int"))
+                Value="0";
+            else if(Type.equals("double"))
+                Value="0.0";
+            else if(Type.equals("bool"))
+                Value="false";
+        }
+    }
 }
