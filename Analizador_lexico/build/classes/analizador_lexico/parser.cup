@@ -214,6 +214,7 @@ PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                         if(SearchSymbolTable(i.toString())){   
                                             ST tmp = ST.getSymbol(i.toString(),checkScope());
+                                            System.out.println("Test " + getType(e));
                                             System.out.println("Tipo LValue "+ i.toString() +" "+ tmp.Type +" Tipo Expr " + getType(e));
                                             if(getType(e).equals(tmp.Type)){                  
                                                 RESULT = e;}

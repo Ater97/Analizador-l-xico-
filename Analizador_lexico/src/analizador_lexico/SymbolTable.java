@@ -60,7 +60,7 @@ public class SymbolTable {
  
     public String DictionaryToString()
     {
-        String temp = "";
+        String temp = "Name Scope Type Value\n";
         ArrayList<ST> aux = new ArrayList<>();
         aux.addAll(SymbolHashtable.values());
         for (int i = 0; i < aux.size(); i++) {
@@ -73,7 +73,9 @@ public class SymbolTable {
     {
         String staticPath = Analizador_lexico.staticPath;
         System.out.println(staticPath);
-        //CreateFile(staticPath, staticPath, DictionaryToString());
+        String temp = DictionaryToString();
+        String[] array = staticPath.split("\\\\");
+        CreateFile(array[array.length -1], staticPath, temp);
     }
 
     public static void CreateFile(String filename, String path, String MainList) throws IOException
