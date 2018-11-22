@@ -113,7 +113,7 @@ terminal Object     plus,Negation,mult,div,mod;
 terminal Object     EXCLA, Less, Greater;
 
 terminal Object     ident, STRINGCONSTANT;
-terminal Object        INTCONSTANT;
+terminal Object     INTCONSTANT;
 terminal Object     DOUBLECONSTANT;
 
 non terminal Object Program, Decl, VariableDecl, Variable, Type, FunctionDecl, Formals, ClassDecl, Field, 
@@ -202,7 +202,7 @@ StmtBlock           ::= LeftBracket StmtBlockA StmtBlockB RightBracket {: quitSc
 StmtBlockA          ::= StmtBlockA  VariableDecl|;
 StmtBlockB          ::= Stmt StmtBlockB|;
 
-Stmt                ::= Expr Semicolon
+Stmt                ::= Expr:e Semicolon {:RESULT = e;:}
                       | Semicolon
                       | IfStmt
                       | WhileStmt
@@ -227,8 +227,6 @@ PrintStmtA          ::= Expr PrintStmtAa;
 PrintStmtAa         ::= Comma Expr PrintStmtAa | ;
 
 Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
-                                                System.out.println(i);
-                                                System.out.println(e);
                                                 System.out.println("LValue Equal Expr:: " + i + " " + e);
                                         if(SearchSymbolTable(i.toString())){   
                                             ST tmp = ST.getSymbol(i.toString(),checkScope());
@@ -380,8 +378,8 @@ Actuals             ::= Expr ActualsA
 ActualsA            ::= Comma Expr ActualsA 
                       | ;
 
-Constant            ::= INTCONSTANT:v       {:System.out.println(" \\ INTCONSTANT / "+v);RESULT = v;:}
-                      | DOUBLECONSTANT:v    {:/*System.out.println(" \\ DOUBLECONSTANT / "+v);*/RESULT = v;:}
-                      | BOOLCONSTANT:v      {:/*System.out.println(" \\ BOOLCONSTANT / "+v);*/RESULT = v;:}
-                      | STRINGCONSTANT:v    {:/*System.out.println(" \\ STRINGCONSTANT / "+v);*/RESULT = v;:}
+Constant            ::= INTCONSTANT:v       {:System.out.println(" \\ INTCONSTANT / "+v); RESULT = v;:}
+                      | DOUBLECONSTANT:v    {:System.out.println(" \\ DOUBLECONSTANT / "+v); RESULT = v;:}
+                      | BOOLCONSTANT:v      {:System.out.println(" \\ BOOLCONSTANT / "+v); RESULT = v;:}
+                      | STRINGCONSTANT:v    {:System.out.println(" \\ STRINGCONSTANT / "+v); RESULT = v;:}
                       | NULL;
