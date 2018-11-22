@@ -363,7 +363,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                     RESULT = (Object)(((Double)e1) + ((Double)e2));}
                                                 else{
                                                         
-                                                        System.out.println("UNKONW types " + e1 + " " + e2);
+                                                        System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"UNKONW types " + e1 + " " + e2);
                                                     if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                         System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"*ERROR wrong types " + e1.toString() + " " + e2.toString());
                                                         System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"*ERROR wrong types " + getType(e1) + " " + getType(e2));
@@ -405,7 +405,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                     RESULT = (Object)(((Double)e1) - ((Double)e2));}
                                                 else{
                                                         
-                                                        System.out.println("UNKONW types " + e1 + " " + e2);
+                                                        System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"UNKONW types " + e1 + " " + e2);
                                                     if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                         System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"ERROR wrong types " + e1.toString() + " " + e2.toString());
                                                         System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"*ERROR wrong types " + getType(e1) + " " + getType(e2));
@@ -450,7 +450,7 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                     RESULT = (Object)(((Double)e1) * ((Double)e2));}
                                                 else{
                                                         
-                                                        System.out.println("UNKONW types " + e1 + " " + e2);
+                                                        System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"UNKONW types " + e1 + " " + e2);
                                                     if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                         System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"ERROR wrong types " + e1.toString() + " " + e2.toString());
                                                         System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"*ERROR wrong types " + getType(e1) + " " + getType(e2));
@@ -495,7 +495,7 @@ LValue              ::= ident:i     {:RESULT = i;
                                              RESULT = i;
                                     :}
                       | Expr:e Point ident:i  {:RESULT = i;
-                                                System.out.println("Expr " + e.toString() +  ". ident " + i.toString());:}
+                                                System.out.println("Expr:: " + e.toString() +  ". ident:: " + i.toString());:}
                       | Expr LeftBrace Expr RightBrace;
 
 Call                ::= ident:i LeftParenthesis Actuals RightParenthesis{:RESULT = i;
