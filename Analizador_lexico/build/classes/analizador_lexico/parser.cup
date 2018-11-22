@@ -294,13 +294,22 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                     ST.update(i.toString(),checkScope(),e.toString());
                                                 }
                                                 else{ 
-                                                    System.out.println("*ERROR wrong types " + i.toString() + " " + e.toString());
-                                                    System.out.println("*ERROR wrong types " + getType(i) + " " + getType(e));}
+                                                    System.out.println("Column: " + (iright+1)+ " Line:"+ (ileft+1)+"*ERROR wrong types " + i.toString() + " " + e.toString());
+                                                    System.out.println("Column: " + (iright+1)+ " Line:"+ (ileft+1)+"*ERROR wrong types " + getType(i) + " " + getType(e));}
                                             }:}
 
                       | Constant:c {:RESULT = c;:}
-                      | Negation Expr
-                      | EXCLA Expr      /*true false*/ {: :}
+                      | Negation Expr:e         {:if(SearchSymbolTable(e.toString())){   
+                                                    //ST tmp = ST.getSymbol(e.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e.toString());
+                                                    System.out.println("e Name:: " + e.toString());
+                                                    e = (Object)tmp.Value;
+                                                    System.out.println("e Value:: " + e.toString());  
+                                                }
+                                                if(getType(e).equals("int"))
+                                                    RESULT = (Object)((Integer.parseInt(String.valueOf(e))) * (-1));
+                                                            :}
+                      | EXCLA Expr      /*true false*/ {: RESULT=true;:}
                       | Expr:e1 Less Expr:e2  /*true false*/ {: 
                                                 RESULT=true;
 
@@ -346,15 +355,15 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                     RESULT = (Object)((Integer.parseInt(String.valueOf(e1))) + ((Integer.parseInt(String.valueOf(e2)))));}
 
                                                 else if ((getType(e1).equals("double")) && (getType(e2).equals("double"))) {
-                                                    RESULT = (Object)(((Double)e1) + ((Double)e2));}
+                                                    RESULT = (Object)(( Double.parseDouble(String.valueOf(e1))) + ( Double.parseDouble(String.valueOf(e2))));}
                                                 else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
                                                     RESULT = (Object)(((Double)e1) + ((Double)e2));}
                                                 else{
                                                         
                                                         System.out.println("UNKONW types " + e1 + " " + e2);
                                                     if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                        System.out.println("*ERROR wrong types " + e1.toString() + " " + e2.toString());
-                                                        System.out.println("*ERROR wrong types " + getType(e1) + " " + getType(e2));
+                                                        System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"*ERROR wrong types " + e1.toString() + " " + e2.toString());
+                                                        System.out.println("Column: " + (e1right+1)+ " Line:"+ (e1left+1)+"*ERROR wrong types " + getType(e1) + " " + getType(e2));
                                                 }
                                                 }:}
                       | Expr:e1 Negation Expr:e2 {:
