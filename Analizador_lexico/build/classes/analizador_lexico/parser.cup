@@ -68,7 +68,7 @@ action code {:
                 return "int";
             else if (obj instanceof Double||isDouble(obj.toString()))
                 return "double";
-            else if (obj instanceof Boolean)
+            else if (obj instanceof Boolean||isBoolean(obj.toString()))
                 return "bool";
             else if (obj instanceof String)
                 {
@@ -100,7 +100,14 @@ action code {:
                 return false;
             }
         }
-
+        public boolean isBoolean(String str) {
+            try {
+               Boolean.parseBoolean(str);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
         public String checkScope(){
             if (scopes.empty()||getStackElement(scopes,0)==null)
                 return "Global";
@@ -144,7 +151,8 @@ terminal Object     INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPLEMENTS,
                     READLINE, MALLOC, BOOLCONSTANT, NULL, GETBYTE, SETBYTE,INCLUDE;
 
 terminal Object     Semicolon, LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    /*Arithmetic_Op,*/ Equal, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+                    /*Arithmetic_Op,*/ Equal, Comparison_op, LeftBrace, RightBrace, Point, Logical_Op,
+                    LessEqual,GreaterEqual;
 
 terminal Object     plus,Negation,mult,div,mod;
 
@@ -169,7 +177,7 @@ precedence left     Equal, INT, DOUBLE, BOOL, STRING, VOID, CLASS, EXTENDS, IMPL
 precedence left     Semicolon;
 
 precedence left     LeftParenthesis, RightParenthesis, LeftBracket, RightBracket, Comma,
-                    /*Arithmetic_Op,*/ Comparison_op, LeftBrace, RightBrace, Point, Logical_Op;
+                    /*Arithmetic_Op,*/ Comparison_op, GreaterEqual,LessEqual,LeftBrace, RightBrace, Point, Logical_Op;
  
 precedence left     STRINGCONSTANT, INTCONSTANT, DOUBLECONSTANT, ident, EXCLA, Negation, Less, Greater;
 
@@ -293,25 +301,13 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                       | Constant:c {:RESULT = c;:}
                       | Negation Expr
                       | EXCLA Expr      /*true false*/ {: :}
-                      | Expr:e1 Less Expr:e2  /*true false*/ {: if(SearchSymbolTable(e1.toString())){   
-                                                    ST tmp = getSymbolGlobal(e1.toString());
-                                                    e1 = (Object)tmp.Value;
-                                                }
-                                                if(SearchSymbolTable(e2.toString())){   
-                                                    ST tmp = getSymbolGlobal(e2.toString());
-                                                    e2 = (Object)tmp.Value;
-                                                } 
-                                                
+                      | Expr:e1 Less Expr:e2  /*true false*/ {: 
+                                                RESULT=true;
 
                                                 :}
-                      | Expr:e1 Greater Expr:e2 /*true false*/{: if(SearchSymbolTable(e1.toString())){   
-                                                    ST tmp = getSymbolGlobal(e1.toString());
-                                                    e1 = (Object)tmp.Value;
-                                                }
-                                                if(SearchSymbolTable(e2.toString())){   
-                                                    ST tmp = getSymbolGlobal(e2.toString());
-                                                    e2 = (Object)tmp.Value;
-                                                } :}
+                      | Expr:e1 Greater Expr:e2 /*true false*/{: 
+                                                RESULT=true;
+                                                :}
                       | LValue: i {:RESULT = i;:}
                       | THIS
                       | Call
@@ -357,28 +353,95 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                         
                                                         System.out.println("UNKONW types " + e1 + " " + e2);
                                                     if ((getType(e1) != "n") && (getType(e2) != "n")){
+                                                        System.out.println("*ERROR wrong types " + e1.toString() + " " + e2.toString());
+                                                        System.out.println("*ERROR wrong types " + getType(e1) + " " + getType(e2));
+                                                }
+                                                }:}
+                      | Expr:e1 Negation Expr:e2 {:
+                                                if(SearchSymbolTable(e1.toString())){   
+                                                    //ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e1.toString());
+                                                    System.out.println("e1 Name:: " + e1.toString());
+                                                    e1 = (Object)tmp.Value;
+                                                    System.out.println("e1 Value:: " + e1.toString());
+                                                }
+                                                if(SearchSymbolTable(e2.toString())){   
+                                                    //ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e2.toString());
+                                                     System.out.println("e2 Name:: " + e2.toString());
+                                                    e2 = (Object)tmp.Value;
+                                                    System.out.println("e2 Value:: " + e2.toString());
+                                                }
+                                                if(getType(e1).equals(getType(e2)))
+                                                { 
+                                                    if(e1 == null)
+                                                    {
+                                                        RESULT = e2;}
+                                                    if(e2 == null)
+                                                    {
+                                                        RESULT = e1;}
+                                                }
+                                                //System.out.println("minus::" + e1.toString() + " " + e2.toString());
+                                                System.out.println("minus::" + getType(e1) + " " + getType(e2));
+                                                if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
+                                                   
+                                                    RESULT = (Object)((Integer.parseInt(String.valueOf(e1))) + ((Integer.parseInt(String.valueOf(e2)))));}
+
+                                                else if ((getType(e1).equals("double")) && (getType(e2).equals("double"))) {
+                                                    RESULT = (Object)(((Double)e1) - ((Double)e2));}
+                                                else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
+                                                    RESULT = (Object)(((Double)e1) - ((Double)e2));}
+                                                else{
+                                                        
+                                                        System.out.println("UNKONW types " + e1 + " " + e2);
+                                                    if ((getType(e1) != "n") && (getType(e2) != "n")){
                                                         System.out.println("ERROR wrong types " + e1.toString() + " " + e2.toString());
                                                         System.out.println("*ERROR wrong types " + getType(e1) + " " + getType(e2));
                                                 }
                                                 }:}
-                      | Expr:e1 Negation Expr:e2 {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
-                                                    RESULT = ((Integer)e1) - ((Integer)e2);
-                                                }else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
-                                                    RESULT = ((Double)e1) - ((Double)e2);
-                                                }else{
-                                                    //RESULT = null;
-                                                if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                    System.out.println("ERROR wrong types "+ e1 + " " + e2);
+
+
+
+                      | Expr:e1 mult Expr:e2    {:
+                                                if(SearchSymbolTable(e1.toString())){   
+                                                    //ST tmp = ST.getSymbol(e1.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e1.toString());
+                                                    System.out.println("e1 Name:: " + e1.toString());
+                                                    e1 = (Object)tmp.Value;
+                                                    System.out.println("e1 Value:: " + e1.toString());
                                                 }
-                                                }:}
-                      | Expr:e1 mult Expr:e2    {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
-                                                    RESULT = ((Integer)e1) * ((Integer)e2);
-                                                }else if (((getType(e1).equals("int"))||(getType(e1).equals("double")) && ((getType(e2).equals("int"))||(getType(e2).equals("double"))))) {
-                                                    RESULT = ((Double)e1) * ((Double)e2);
-                                                }else{
-                                                    //RESULT = null;
-                                                if ((getType(e1) != "n") && (getType(e2) != "n")){
-                                                    System.out.println("ERROR wrong types "+ e1 + " " + e2);
+                                                if(SearchSymbolTable(e2.toString())){   
+                                                    //ST tmp = ST.getSymbol(e2.toString(),checkScope());
+                                                    ST tmp = getSymbolGlobal(e2.toString());
+                                                     System.out.println("e2 Name:: " + e2.toString());
+                                                    e2 = (Object)tmp.Value;
+                                                    System.out.println("e2 Value:: " + e2.toString());
+                                                }
+                                                if(getType(e1).equals(getType(e2)))
+                                                { 
+                                                    if(e1 == null)
+                                                    {
+                                                        RESULT = e2;}
+                                                    if(e2 == null)
+                                                    {
+                                                        RESULT = e1;}
+                                                }
+                                                //System.out.println("plus::" + e1.toString() + " " + e2.toString());
+                                                System.out.println("plus::" + getType(e1) + " " + getType(e2));
+                                                 if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
+                                                   
+                                                    RESULT = (Object)((Integer.parseInt(String.valueOf(e1))) + ((Integer.parseInt(String.valueOf(e2)))));}
+
+                                                else if ((getType(e1).equals("double")) && (getType(e2).equals("double"))) {
+                                                    RESULT = (Object)(((Double)e1) * ((Double)e2));}
+                                                else if (((getType(e1).equals("int"))||(getType(e1).equals("double"))) && ((getType(e2).equals("int"))||(getType(e2).equals("double")))) {
+                                                    RESULT = (Object)(((Double)e1) * ((Double)e2));}
+                                                else{
+                                                        
+                                                        System.out.println("UNKONW types " + e1 + " " + e2);
+                                                    if ((getType(e1) != "n") && (getType(e2) != "n")){
+                                                        System.out.println("ERROR wrong types " + e1.toString() + " " + e2.toString());
+                                                        System.out.println("*ERROR wrong types " + getType(e1) + " " + getType(e2));
                                                 }
                                                 }:}
                       | Expr:e1 div Expr:e2     {:if ((getType(e1).equals("int")) && (getType(e2).equals("int"))) {
@@ -401,8 +464,10 @@ Expr                ::= LValue:i Equal Expr:e {: RESULT = i;
                                                     System.out.println("ERROR wrong types "+ e1 + " " + e2);
                                                 }
                                                 }:}
-                      | Expr Comparison_op Expr
-                      | Expr Logical_Op Expr
+                      | Expr Comparison_op Expr {:RESULT=true;:}
+                      | Expr GreaterEqual Expr  {:RESULT=true;:}
+                      | Expr LessEqual Expr     {:RESULT=true;:}
+                      | Expr Logical_Op Expr    {:RESULT=true;:}
                       | NEW LeftParenthesis ident:i RightParenthesis {:RESULT = i;
                                         if(SearchSymbolTable(i.toString()))                     
                                              RESULT = i;

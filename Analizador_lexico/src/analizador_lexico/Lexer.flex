@@ -136,7 +136,8 @@ Errors          = (("\/\*")(\n)*)|(\/\*\n)|(\/\*)({WhiteSpace}|{Newline})*
 /*Comparison_op   = "<"|">"|"<="|">="|"=="|"!="*/
 "<"                 {return new Symbol(sym.Less, yyline, yycolumn, yytext());}
 ">"                 {return new Symbol(sym.Greater, yyline, yycolumn, yytext());}
-
+"<="                {return new Symbol(sym.LessEqual, yyline, yycolumn, yytext());}
+">="                {return new Symbol(sym.GreaterEqual, yyline, yycolumn, yytext());}
 
 /*{Arithmetic_Op}     {return new Symbol(sym.Arithmetic_Op, yyline, yycolumn, yytext());}*/
 "+"                 {return new Symbol(sym.plus, yyline, yycolumn, yytext());}
